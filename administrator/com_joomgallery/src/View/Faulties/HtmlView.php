@@ -52,7 +52,8 @@ class HtmlView extends JoomGalleryView
 
 		// Development code for Metadata Service
 		$this->component->createMetadata($processor);
-		echo $this->component->getMetadata()->hello();
+		$array = array();
+		echo $this->component->getMetadata()->saveExifEdit("", $array);
 
     return;
 
