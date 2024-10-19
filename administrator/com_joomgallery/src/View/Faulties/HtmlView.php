@@ -20,6 +20,7 @@ use \Joomla\CMS\HTML\Helpers\Sidebar;
 use \Joomla\Component\Content\Administrator\Extension\ContentComponent;
 use \Joomgallery\Component\Joomgallery\Administrator\Helper\JoomHelper;
 use \Joomgallery\Component\Joomgallery\Administrator\View\JoomGalleryView;
+use \lsolesen\pel\PelTag;
 
 /**
  * View class for a list of Faulties.
@@ -53,6 +54,7 @@ class HtmlView extends JoomGalleryView
 		// Development code for Metadata Service
 		$this->component->createMetadata($processor);
 		$array = array();
+		$array[PelTag::IMAGE_DESCRIPTION] = "Test";
 		echo $this->component->getMetadata()->saveExifEdit("", $array);
 
     return;

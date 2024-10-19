@@ -39,6 +39,9 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
 {
   use ServiceTrait;
 
+  /**
+   * @var array
+   */
   public static $entryTypes = [
     PelTag::IMAGE_DESCRIPTION => PelFormat::ASCII,
     PelTag::MAKE => PelFormat::ASCII,
@@ -90,18 +93,6 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
   ];
 
   /**
-   * First method
-   *
-   * @return  string
-   *
-   * @since   4.0.0
-   */
-  public function hello(): string
-  {
-    return 'Hello from the <b>PHP</b> version of the Metadata-Service...';
-  }
-
-  /**
    * Saves an edit to the exif metadata of an image
    * 
    * @param   string $img   Path to the image 
@@ -113,31 +104,30 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    */
   public function saveExifEdit(string $img, array $edits): bool {
     // Remove after implementation
-    Pel::setDebug(true);
+    //Pel::setDebug(true);
     // Temporary until form
     $file = file_get_contents(__DIR__ . "/Ricoh_Caplio_RR330.jpg");
 
     $data = new PelDataWindow($file);
     if (PelJpeg::isValid($data)) {
-      $jpeg = new PelJpeg();
+      $jpeg = $file = new PelJpeg();
       $jpeg->load($data);
       $exifdata = $jpeg->getExif();
-      // Check if APP1 section exists
+      // Check if APP1 section exists, create if not along with tiff
       if ($exifdata == null) {
-        // Create APP1 section if not exists
         $exifdata = new PelExif();
         $jpeg->setExif($exifdata);
-        // Create empty TIFF structure for the APP1 section
         $tiff = new PelTiff();
         $exifdata->setTiff($tiff);
       }
       $tiff = $exifdata->getTiff();
     } elseif (PelTiff::isValid($data)) {
       // Data was recognized as TIFF. PelTiff/Ifd is what is being edited regardless.
-      $tiff = new PelTiff();
+      $tiff = $file = new PelTiff();
       $tiff->load($data);
     } else {
       // Handle invalid data
+      return false;
     }
     // Grab the root IFD from the TIFF. IFDs are what is actually being edited.
     $ifd0 = $tiff->getIfd();
@@ -149,33 +139,29 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     }
     // The majority of EXIF data is stored in the sub IFD
     $subIfd = $ifd0->getSubIfd(PelIfd::EXIF);
-
+    $editor = new PelDataEditor();
     // Cycle through all the necessary edits and perform them
-    foreach ($edits as $key => $edit) {
+    foreach ($edits as $tag => $edit) {
+      if (!isset(self::$entryTypes[$tag])) {
+        echo self::$entryTypes[$tag];
+        echo "test";
+        // Address does not reference a tag
+        continue;
+        // TODO: Handle this properly
+      }
       // Check if edit should take place on the root or the sub IFD.
-      if ($key <= 33432) {
-        $toEdit = $ifd0->getEntry($key);
-        if ($toEdit == null) {
-          $toEdit = new PelEntryAscii($key, $edit);
-          $ifd0->addEntry($toEdit);
-        } else {
-          $toEdit->setValue($edit);
-        }
+      if ($tag <= 33432) {
+        $editor->makeEdit($ifd0, $tag, $edit, self::$entryTypes[$tag]);
       } else {
-        $toEdit = $subIfd->getEntry($key);
-        if ($toEdit == null) {
-          $toEdit = new PelEntryAscii($key, $edit);
-          $subIfd->addEntry($toEdit);
-        } else {
-          $toEdit->setValue($edit);
-        }
+        $editor->makeEdit($subIfd, $tag, $edit, self::$entryTypes[$tag]);
       }
     }
     
     //$doc_name = $ifd0->getEntry(PelTag::DOCUMENT_NAME);
     //print($doc_name);
-    echo "PelJpeg loaded";
-    return false;
+    //echo "PelJpeg loaded";
+    $file->saveFile(__DIR__ . "/Ricoh_Caplio_RR330.jpg");
+    return true;
   }
 
   /**
