@@ -42,7 +42,6 @@ class RawView extends JoomGalleryView
 
     // Get image path
     $img_path = JoomHelper::getImg($id, $type, false, false);
-    xdebug_break();
 
     // Create filesystem service
     $adapter = '';

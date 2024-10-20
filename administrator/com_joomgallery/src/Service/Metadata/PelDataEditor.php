@@ -33,7 +33,7 @@ require __DIR__ . '/../../../../../vendor/autoload.php';
  */
 class PelDataEditor {
 
-    protected static $timeTags = [PelTag::DATE_TIME, PelTag::DATE_TIME_ORIGINAL, PelTAg::DATE_TIME_DIGITIZED];
+    protected static $timeTags = [PelTag::DATE_TIME, PelTag::DATE_TIME_ORIGINAL, PelTag::DATE_TIME_DIGITIZED];
 
     public function makeEdit(PelIfd $ifd, int $tag, mixed $data, int $format) {
         $entry = $ifd->getEntry($tag);

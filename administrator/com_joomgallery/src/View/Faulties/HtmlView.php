@@ -54,7 +54,12 @@ class HtmlView extends JoomGalleryView
 		// Development code for Metadata Service
 		$this->component->createMetadata($processor);
 		$array = array();
-		$array[PelTag::IMAGE_DESCRIPTION] = "Test";
+		/*$array[PelTag::IMAGE_DESCRIPTION] = "Testing";
+		$array[PelTag::ORIENTATION] = 1;
+		$array[PelTag::FNUMBER] = [287, 100];
+		$array[PelTag::COPYRIGHT] = ['graph', 'editor'];
+		$array[PelTag::SUBJECT_DISTANCE] = [2, 1];
+		$array[PelTag::USER_COMMENT] = "This is a user comment.";*/
 		echo $this->component->getMetadata()->saveExifEdit("", $array);
 
     return;

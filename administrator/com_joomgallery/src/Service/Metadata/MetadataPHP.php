@@ -139,12 +139,11 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     }
     // The majority of EXIF data is stored in the sub IFD
     $subIfd = $ifd0->getSubIfd(PelIfd::EXIF);
+    //xdebug_break();
     $editor = new PelDataEditor();
     // Cycle through all the necessary edits and perform them
     foreach ($edits as $tag => $edit) {
       if (!isset(self::$entryTypes[$tag])) {
-        echo self::$entryTypes[$tag];
-        echo "test";
         // Address does not reference a tag
         continue;
         // TODO: Handle this properly
@@ -157,9 +156,6 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
       }
     }
     
-    //$doc_name = $ifd0->getEntry(PelTag::DOCUMENT_NAME);
-    //print($doc_name);
-    //echo "PelJpeg loaded";
     $file->saveFile(__DIR__ . "/Ricoh_Caplio_RR330.jpg");
     return true;
   }
