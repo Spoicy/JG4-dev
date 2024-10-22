@@ -26,6 +26,8 @@ use Joomgallery\Component\Joomgallery\Administrator\User\UserFactory;
 use Joomgallery\Component\Joomgallery\Administrator\Extension\JoomgalleryComponent;
 use Joomgallery\Component\Joomgallery\Administrator\MVC\MVCFactoryProvider as MVCFactory;
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 /**
  * The Joomgallery service provider.
  *

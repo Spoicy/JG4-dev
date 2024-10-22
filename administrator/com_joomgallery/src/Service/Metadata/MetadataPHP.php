@@ -12,7 +12,6 @@ namespace Joomgallery\Component\Joomgallery\Administrator\Service\Metadata;
 
 // No direct access
 \defined('_JEXEC') or die;
-require __DIR__ . '/../../../../../vendor/autoload.php';
 
 use \Joomla\CMS\Factory;
 use \Joomgallery\Component\Joomgallery\Administrator\Helper\JoomHelper;

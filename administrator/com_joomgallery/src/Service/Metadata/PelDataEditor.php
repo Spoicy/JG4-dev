@@ -23,7 +23,6 @@ use \lsolesen\pel\PelTag;
 
 // No direct access
 \defined('_JEXEC') or die;
-require __DIR__ . '/../../../../../vendor/autoload.php';
 
 /**
  * Editor class to handle exif data type editing
