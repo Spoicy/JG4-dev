@@ -102,8 +102,6 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    * @since   4.0.0
    */
   public function saveExifEdit(string $img, array $edits): bool {
-    // Remove after implementation
-    //Pel::setDebug(true);
     // Temporary until form
     $file = file_get_contents(__DIR__ . "/Ricoh_Caplio_RR330.jpg");
 
@@ -131,14 +129,12 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     // Grab the root IFD from the TIFF. IFDs are what is actually being edited.
     $ifd0 = $tiff->getIfd();
     if ($ifd0 == null) {
-      // Image did not contain an IFD, so no former Exif data.
-      // Populate Tiff with an empty IFD
+      // Image did not contain an IFD, so no former Exif data, populate with an empty IFD
       $ifd0 = new PelIfd(PelIfd::IFD0);
       $tiff->setIfd($ifd0);
     }
     // The majority of EXIF data is stored in the sub IFD
     $subIfd = $ifd0->getSubIfd(PelIfd::EXIF);
-    //xdebug_break();
     $editor = new PelDataEditor();
     // Cycle through all the necessary edits and perform them
     foreach ($edits as $tag => $edit) {
@@ -170,7 +166,8 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    * @since   4.0.0
    */
   public function saveIptcEdit(string $img, array $edits): bool {
-    // Currently unimplemented, will be implemented.
+    $editor = new IptcDataEditor();
+    $editor->createEdit("", "");
     return false;
   }
 

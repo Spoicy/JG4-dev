@@ -32,17 +32,24 @@ use \lsolesen\pel\PelTag;
  */
 class PelDataEditor {
 
+    /**
+     * @var array
+     */
     protected static $timeTags = [PelTag::DATE_TIME, PelTag::DATE_TIME_ORIGINAL, PelTag::DATE_TIME_DIGITIZED];
 
+    /**
+     * Makes an edit to the metadata directly.
+     * Note: File must be saved with the PelJpeg/PelTiff object for the edits to persist.
+     * 
+     * @param   PelIfd $ifd    The IFD that contains the necessary entry
+     * @param   int    $tag    The tag that contains the necessary data
+     * @param   mixed  $data   The data to be saved
+     * @param   int    $format The format in which the data must be saved (given as one of the PelTag consts)
+     * 
+     * @since   4.0.0
+     */
     public function makeEdit(PelIfd $ifd, int $tag, mixed $data, int $format) {
         $entry = $ifd->getEntry($tag);
-        /*if ($entry == null) {
-            $entry = new PelEntryAscii($tag, $data);
-            $ifd->addEntry($entry);
-        } else {
-            $entry->setValue($data);
-        }*/
-        
         if (in_array($tag, self::$timeTags)) {
             if ($entry == null) {
                 $entry = new PelEntryTime($tag, $data, PelEntryTime::EXIF_STRING);

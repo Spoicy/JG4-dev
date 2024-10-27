@@ -60,7 +60,8 @@ class HtmlView extends JoomGalleryView
 		$array[PelTag::COPYRIGHT] = ['graph', 'editor'];
 		$array[PelTag::SUBJECT_DISTANCE] = [2, 1];
 		$array[PelTag::USER_COMMENT] = "This is a user comment.";*/
-		echo $this->component->getMetadata()->saveExifEdit("", $array);
+		//echo $this->component->getMetadata()->saveExifEdit("", $array);
+		echo $this->component->getMetadata()->saveIptcEdit("", $array);
 
     return;
 
