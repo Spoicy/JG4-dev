@@ -77,7 +77,7 @@ class IptcDataEditor
     );
 
     /**
-     * Creates the octet structure to be saved with iptcembed.
+     * Validates input and creates the octet structure to be saved with iptcembed.
      * 
      * @param   string $tag  The record & dataset tags in a 0#000 format
      * @param   mixed  $data The data to be stored
@@ -89,14 +89,10 @@ class IptcDataEditor
     public function createEdit(string $tag, mixed $data): string
     {
         // TODO: Add data validation
-        if (!isset(self::$iptcHeaderArray[$tag])) {
-            return false;
-        }
         $explode = explode("#", $tag);
         $octetStruct = self::makeTag(intval($explode[0]), intval($explode[1]), $data);
         return $octetStruct;
     }
-
 
     /**
      * Create the necessary octet structure to be saved.
@@ -133,5 +129,16 @@ class IptcDataEditor
         }
 
         return $retval . $value;
+    }
+
+    public function appendTags(array $app13, string $tags): string {
+        $retval = "";
+        return false;
+        foreach ($app13 as $tag => $value) {
+            var_dump($value);
+            $explode = explode("#", $tag);
+            $retval .= self::makeTag(intval($explode[0]), intval($explode[1]), $value[0]);
+        }
+        return $retval . $tags;
     }
 }

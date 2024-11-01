@@ -167,8 +167,19 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    */
   public function saveIptcEdit(string $img, array $edits): bool {
     $editor = new IptcDataEditor();
-    $editor->createEdit("", "");
+    $size = getimagesize(__DIR__ . "/IPTC-GoogleImgSrcPmd_testimg012.jpg", $info);
+    $iptc = iptcparse($info['APP13']);
+    var_dump($iptc);
     return false;
+    $tagString = $editor->createEdit("2#090", "London");
+    $tagString .= $editor->createEdit("2#095", "England");
+    //$appendedString = $editor->appendTags($iptc, $tagString);
+    $content = iptcembed($tagString, __DIR__ . "/IPTC-GoogleImgSrcPmd_testimg01.jpg");
+
+    $fp = fopen(__DIR__ . "/IPTC-GoogleImgSrcPmd_testimg01.jpg", "wb");
+    fwrite($fp, $content);
+    fclose($fp);
+    return true;
   }
 
   /**
