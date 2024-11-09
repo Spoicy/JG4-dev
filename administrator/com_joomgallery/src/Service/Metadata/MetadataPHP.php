@@ -51,6 +51,7 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     PelTag::RESOLUTION_UNIT => PelFormat::SHORT,
     PelTag::SOFTWARE => PelFormat::ASCII,
     PelTag::DATE_TIME => PelFormat::ASCII,
+    PelTag::ARTIST => PelFormat::ASCII,
     PelTag::WHITE_POINT => PelFormat::RATIONAL,
     PelTag::PRIMARY_CHROMATICITIES => PelFormat::RATIONAL,
     PelTag::YCBCR_COEFFICIENTS => PelFormat::RATIONAL,
@@ -215,7 +216,7 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
         $metadata['iptc'][$key] = $value[0];
       }
     }
-    
+
     return $metadata;
   }
 

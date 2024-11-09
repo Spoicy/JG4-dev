@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+    <field name="exif_imagedescription"
+           type="text"
+           pattern="^[\x20-\x7E]*$"
+           label="COM_JOOMGALLERY_IFD0_IMAGEDESCRIPTION"
+           message="COM_JOOMGALLERY_IFD0_IMAGEDESCRIPTION_DESCRIPTION" />
+
+    <field name="exif_make"
+           type="text"
+           pattern="^[\x20-\x7E]*$"
+           label="COM_JOOMGALLERY_IFD0_MAKE"
+           message="COM_JOOMGALLERY_IFD0_MAKE_DESCRIPTION" />
+
+    <field name="exif_model"
+           type="text"
+           pattern="^[\x20-\x7E]*$"
+           label="COM_JOOMGALLERY_IFD0_MODEL"
+           message="COM_JOOMGALLERY_IFD0_MODEL_DESCRIPTION" />
+
+    <field name="exif_orientation"
+           type="list"
+           default="1"
+           label="COM_JOOMGALLERY_IFD0_ORIENTATION"
+           description="COM_JOOMGALLERY_IFD0_ORIENTATION_DESCRIPTION">
+         <option value="1">COM_JOOMGALLERY_IFD0_ORIENTATION_1</option>
+         <option value="2">COM_JOOMGALLERY_IFD0_ORIENTATION_2</option>
+         <option value="3">COM_JOOMGALLERY_IFD0_ORIENTATION_3</option>
+         <option value="4">COM_JOOMGALLERY_IFD0_ORIENTATION_4</option>
+         <option value="5">COM_JOOMGALLERY_IFD0_ORIENTATION_5</option>
+         <option value="6">COM_JOOMGALLERY_IFD0_ORIENTATION_6</option>
+         <option value="7">COM_JOOMGALLERY_IFD0_ORIENTATION_7</option>
+         <option value="8">COM_JOOMGALLERY_IFD0_ORIENTATION_8</option>
+    </field>
+
+    <field name="exif_xresolution"
+           type="text"
+           pattern="^\d+\/\d+$"
+           label="COM_JOOMGALLERY_IFD0_XRESOLUTION"
+           message="COM_JOOMGALLERY_IFD0_XRESOLUTION_DESCRIPTION" />
+
+    <field name="exif_yresolution"
+           type="text"
+           pattern="^\d+\/\d+$"
+           label="COM_JOOMGALLERY_IFD0_YRESOLUTION"
+           message="COM_JOOMGALLERY_IFD0_YRESOLUTION_DESCRIPTION" />
+
+    <field name="exif_resolutionunit"
+           type="list"
+           default="1"
+           label="COM_JOOMGALLERY_IFD0_RESOLUTIONUNIT"
+           description="COM_JOOMGALLERY_IFD0_RESOLUTIONUNIT_DESCRIPTION">
+         <option value="1">COM_JOOMGALLERY_IFD0_RESOLUTIONUNIT_1</option>
+         <option value="2">COM_JOOMGALLERY_IFD0_RESOLUTIONUNIT_2</option>
+         <option value="3">COM_JOOMGALLERY_IFD0_RESOLUTIONUNIT_3</option>
+         <option value="4">COM_JOOMGALLERY_IFD0_RESOLUTIONUNIT_4</option>
+         <option value="5">COM_JOOMGALLERY_IFD0_RESOLUTIONUNIT_5</option>
+    </field>
+
+    <field name="exif_software"
+           type="text"
+           pattern="^[\x20-\x7E]*$"
+           label="COM_JOOMGALLERY_IFD0_SOFTWARE"
+           message="COM_JOOMGALLERY_IFD0_SOFTWARE_DESCRIPTION" />
+
+    <field name="exif_datetime"
+           type="text"
+           pattern="^[\x20-\x7E]*$"
+           label="COM_JOOMGALLERY_IFD0_DATETIME"
+           message="COM_JOOMGALLERY_IFD0_DATETIME_DESCRIPTION" />
+
+    <field name="exif_whitepoint"
+           type="text"
+           pattern="^\d+\/\d+$"
+           label="COM_JOOMGALLERY_IFD0_WHITEPOINT"
+           message="COM_JOOMGALLERY_IFD0_WHITEPOINT_DESCRIPTION" />
+
+    <field name="exif_primarychromaticities"
+           type="text"
+           pattern="^\d+\/\d+$"
+           label="COM_JOOMGALLERY_IFD0_PRIMARYCHROMATICITIES"
+           message="COM_JOOMGALLERY_IFD0_PRIMARYCHROMATICITIES_DESCRIPTION" />
+
+    <field name="exif_ycbcrcoefficients"
+           type="text"
+           pattern="^\d+\/\d+$"
+           label="COM_JOOMGALLERY_IFD0_YCBCRCOEFFICIENTS"
+           message="COM_JOOMGALLERY_IFD0_YCBCRCOEFFICIENTS_DESCRIPTION" />
+
+    <field name="exif_ycbcrpositioning"
+           type="list"
+           default="1"
+           label="COM_JOOMGALLERY_IFD0_YCBCRPOSITIONING"
+           description="COM_JOOMGALLERY_IFD0_YCBCRPOSITIONING_DESCRIPTION">
+         <option value="1">COM_JOOMGALLERY_IFD0_RESOLUTIONUNIT_1</option>
+         <option value="2">COM_JOOMGALLERY_IFD0_RESOLUTIONUNIT_2</option>
+    </field>
+
+    <field name="exif_referenceblackwhite"
+           type="text"
+           pattern="^\d+\/\d+$"
+           label="COM_JOOMGALLERY_IFD0_REFERENCEBLACKWHITE"
+           message="COM_JOOMGALLERY_IFD0_REFERENCEBLACKWHITE_DESCRIPTION" />
+
+    <field name="exif_copyright"
+           type="text"
+           pattern="^[\x20-\x7E]*$"
+           label="COM_JOOMGALLERY_IFD0_COPYRIGHT"
+           message="COM_JOOMGALLERY_IFD0_COPYRIGHT_DESCRIPTION" />
+
+    <field name="exif_orientation"
+           type="number"
+           default="1"
+           min="1"
+           max="8"
+           step="1"
+           label="COM_JOOMGALLERY_IFD0_ORIENTATION"
+           description="COM_JOOMGALLERY_IFD0_ORIENTATION_DESCRIPTION" />
+
+</form>
