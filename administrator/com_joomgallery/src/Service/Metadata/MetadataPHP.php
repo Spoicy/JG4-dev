@@ -105,27 +105,12 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     // Temporary until form
     $file = file_get_contents(__DIR__ . "/Ricoh_Caplio_RR330.jpg");
 
-    $data = new PelDataWindow($file);
-    if (PelJpeg::isValid($data)) {
-      $jpeg = $file = new PelJpeg();
-      $jpeg->load($data);
-      $exifdata = $jpeg->getExif();
-      // Check if APP1 section exists, create if not along with tiff
-      if ($exifdata == null) {
-        $exifdata = new PelExif();
-        $jpeg->setExif($exifdata);
-        $tiff = new PelTiff();
-        $exifdata->setTiff($tiff);
-      }
-      $tiff = $exifdata->getTiff();
-    } elseif (PelTiff::isValid($data)) {
-      // Data was recognized as TIFF. PelTiff/Ifd is what is being edited regardless.
-      $tiff = $file = new PelTiff();
-      $tiff->load($data);
-    } else {
-      // Handle invalid data
+    $imageObjects = self::getPelImageObjects($file);
+    if ($imageObjects == false) {
       return false;
     }
+    $file = $imageObjects["file"];
+    $tiff = $imageObjects["tiff"];
     // Grab the root IFD from the TIFF. IFDs are what is actually being edited.
     $ifd0 = $tiff->getIfd();
     if ($ifd0 == null) {
@@ -153,6 +138,71 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     
     $file->saveFile(__DIR__ . "/Ricoh_Caplio_RR330.jpg");
     return true;
+  }
+
+  /**
+   * Gets the jpeg/tiff objects from a valid JPEG or TIFF image with PEL.
+   * 
+   * @param  string $file   The image data
+   * 
+   * @return array|false    File and tiff objects on success, false on failure.
+   */
+  private function getPelImageObjects(string $file): array {
+    $data = new PelDataWindow($file);
+    if (PelJpeg::isValid($data)) {
+      $jpeg = $file = new PelJpeg();
+      $jpeg->load($data);
+      $exifdata = $jpeg->getExif();
+      // Check if APP1 section exists, create if not along with tiff
+      if ($exifdata == null) {
+        $exifdata = new PelExif();
+        $jpeg->setExif($exifdata);
+        $tiff = new PelTiff();
+        $exifdata->setTiff($tiff);
+      }
+      $tiff = $exifdata->getTiff();
+    } elseif (PelTiff::isValid($data)) {
+      // Data was recognized as TIFF. PelTiff/Ifd is what is being edited regardless.
+      $tiff = $file = new PelTiff();
+      $tiff->load($data);
+    } else {
+      // Handle invalid data
+      return false;
+    }
+    return ["file" => $file, "tiff" => $tiff];
+  }
+
+  /**
+   * Copies the metadata from one file to another with PEL.
+   * 
+   * @param  string $srcPath Path to source file
+   * @param  string $dstPath Path to destination file
+   * 
+   * @return int
+   * 
+   * @since 4.0.0
+   */
+  public function copyExifData($srcPath, $dstPath) {
+    $srcFile = file_get_contents($srcPath);
+    $dstFile = file_get_contents($dstPath);
+    $srcImageObjects = self::getPelImageObjects($srcFile);
+    if ($srcImageObjects == false) {
+      return false;
+    }
+    $srcPelTiff = $srcImageObjects["tiff"];
+    $dstImageObjects = self::getPelImageObjects($dstFile);
+    if ($dstImageObjects == false) {
+      return false;
+    }
+    $dstPelFile = $dstImageObjects["file"];
+    if ($dstPelFile instanceof PelJpeg) {
+      $exifdata = $dstPelFile->getExif();
+      $exifdata->setTiff($srcPelTiff);
+    } else {
+      // TIFF not currently supported
+      return false;
+    }
+    return $dstPelFile->saveFile($dstPath);
   }
 
   /**
