@@ -146,6 +146,8 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    * @param  string $file   The image data
    * 
    * @return array|false    File and tiff objects on success, false on failure.
+   * 
+   * @since 4.0.0
    */
   private function getPelImageObjects(string $file): array {
     $data = new PelDataWindow($file);
@@ -170,6 +172,40 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
       return false;
     }
     return ["file" => $file, "tiff" => $tiff];
+  }
+
+  /**
+   * Reads the EXIF and IPTC metadata from a JPEG.
+   * 
+   * @param  string $file  The image path
+   * 
+   * @return array         Metadata in array format
+   * 
+   * @since 4.0.0
+   */
+  public function readJpegMetadata(string $file) {
+    $metadata = array('exif' => array(), 'iptc' => array(), 'comment' => array());
+    $imageObjects = self::getPelImageObjects($file);
+    if ($imageObjects == false) {
+      return;
+    }
+    $tiff = $imageObjects["tiff"];
+    $ifd0 = $tiff->getIfd();
+    if ($ifd0 != null) {
+      $metadata['exif']['IFD0'] = array();
+      foreach ($ifd0->getEntries() as $entry) {
+        $metadata['exif']['IFD0'][PelTag::getName(PelIfd::IFD0, $entry->getTag())] = $entry->getValue();
+      }
+      $subIfd = $ifd0->getSubIfd();
+      if ($subIfd != null) {
+        $metadata['exif']['EXIF'] = array();
+        foreach ($subIfd->getEntries() as $entry) {
+          $metadata['exif']['EXIF'][PelTag::getName(PelIfd::IFD0, $entry->getTag())] = $entry->getValue();
+        }
+      }
+    }
+    
+    
   }
 
   /**
