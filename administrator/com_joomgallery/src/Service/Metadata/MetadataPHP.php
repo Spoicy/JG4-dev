@@ -185,6 +185,8 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    */
   public function readJpegMetadata(string $file) {
     $metadata = array('exif' => array(), 'iptc' => array(), 'comment' => array());
+
+    // EXIF with PEL
     $imageObjects = self::getPelImageObjects($file);
     if ($imageObjects == false) {
       return;
@@ -204,8 +206,17 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
         }
       }
     }
+
+    // IPTC
+    $size = getimagesize($file, $info);
+    if (isset($info["APP13"])) {
+      $iptc = iptcparse($info['APP13']);
+      foreach ($iptc as $key => $value) {
+        $metadata['iptc'][$key] = $value[0];
+      }
+    }
     
-    
+    return $metadata;
   }
 
   /**
