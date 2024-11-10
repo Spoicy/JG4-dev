@@ -87,6 +87,7 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     PelTag::FOCAL_PLANE_X_RESOLUTION => PelFormat::RATIONAL,
     PelTag::FOCAL_PLANE_Y_RESOLUTION => PelFormat::RATIONAL,
     PelTag::FOCAL_PLANE_RESOLUTION_UNIT => PelFormat::SHORT,
+    PelTag::EXPOSURE_INDEX => PelFormat::RATIONAL,
     PelTag::SENSING_METHOD => PelFormat::SHORT,
     PelTag::FILE_SOURCE => PelFormat::UNDEFINED,
     PelTag::SCENE_TYPE => PelFormat::UNDEFINED

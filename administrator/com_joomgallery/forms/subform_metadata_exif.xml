@@ -225,6 +225,7 @@
          <option value="5">COM_JOOMGALLERY_SUBIFD_METERINGMODE_5</option>
          <option value="6">COM_JOOMGALLERY_SUBIFD_METERINGMODE_6</option>
          <option value="255">COM_JOOMGALLERY_SUBIFD_METERINGMODE_255</option>
+    </field>
 
     <field name="exif_lightsource"
            type="list"
@@ -252,6 +253,7 @@
          <option value="23">COM_JOOMGALLERY_SUBIFD_LIGHTSOURCE_23</option>
          <option value="24">COM_JOOMGALLERY_SUBIFD_LIGHTSOURCE_24</option>
          <option value="255">COM_JOOMGALLERY_SUBIFD_LIGHTSOURCE_255</option>
+    </field>
 
     <field name="exif_flash"
            type="list"
@@ -286,5 +288,86 @@
          <option value="89">COM_JOOMGALLERY_SUBIFD_FLASH_89</option>
          <option value="93">COM_JOOMGALLERY_SUBIFD_FLASH_93</option>
          <option value="95">COM_JOOMGALLERY_SUBIFD_FLASH_95</option>
+    </field>
+
+    <field name="exif_focallength"
+           type="text"
+           pattern="^\d+\/\d+$"
+           label="COM_JOOMGALLERY_SUBIFD_FOCALLENGTH"
+           message="COM_JOOMGALLERY_SUBIFD_FOCALLENGTH_DESCRIPTION" />
+
+    <field name="exif_usercommentformat"
+           type="list"
+           default="1"
+           label="COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT"
+           description="COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT_DESCRIPTION">
+         <option value="ASCII">COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT_ASCII</option>
+         <option value="JIS">COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT_JIS</option>
+         <option value="Unicode">COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT_UNICODE</option>
+         <option value="Undefined">COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT_UNDEFINED</option>
+    </field>
+
+    <field name="exif_usercomment"
+           type="text"
+           label="COM_JOOMGALLERY_SUBIFD_USERCOMMENT"
+           message="COM_JOOMGALLERY_SUBIFD_USERCOMMENT_DESCRIPTION" />
+
+    <field name="exif_exifimagewidth"
+           type="number"
+           min="0"
+           max="4294967295"
+           step="1"
+           label="COM_JOOMGALLERY_SUBIFD_EXIFIMAGEWIDTH"
+           description="COM_JOOMGALLERY_SUBIFD_EXIFIMAGEWIDTH_DESCRIPTION" />
+
+    <field name="exif_exifimageheight"
+           type="number"
+           min="0"
+           max="4294967295"
+           step="1"
+           label="COM_JOOMGALLERY_SUBIFD_EXIFIMAGEHEIGHT"
+           description="COM_JOOMGALLERY_SUBIFD_EXIFIMAGEHEIGHT_DESCRIPTION" />
+
+    <field name="exif_focalplanexresolution"
+           type="text"
+           pattern="^\d+\/\d+$"
+           label="COM_JOOMGALLERY_SUBIFD_FOCALPLANEXRESOLUTION"
+           message="COM_JOOMGALLERY_SUBIFD_FOCALPLANEXRESOLUTION_DESCRIPTION" />
+
+    <field name="exif_focalplaneyresolution"
+           type="text"
+           pattern="^\d+\/\d+$"
+           label="COM_JOOMGALLERY_SUBIFD_FOCALPLANEYRESOLUTION"
+           message="COM_JOOMGALLERY_SUBIFD_FOCALPLANEYRESOLUTION_DESCRIPTION" />
+
+    <field name="exif_focalplaneresolutionunit"
+           type="list"
+           default="1"
+           label="COM_JOOMGALLERY_SUBIFD_FOCALPLANERESOLUTIONUNIT"
+           description="COM_JOOMGALLERY_SUBIFD_FOCALPLANERESOLUTIONUNIT_DESCRIPTION">
+         <option value="1">COM_JOOMGALLERY_SUBIFD_FOCALPLANERESOLUTIONUNIT_1</option>
+         <option value="2">COM_JOOMGALLERY_SUBIFD_FOCALPLANERESOLUTIONUNIT_2</option>
+         <option value="3">COM_JOOMGALLERY_SUBIFD_FOCALPLANERESOLUTIONUNIT_3</option>
+    </field>
+
+    <field name="exif_exposureindex"
+           type="text"
+           pattern="^\d+\/\d+$"
+           label="COM_JOOMGALLERY_SUBIFD_EXPOSUREINDEX"
+           message="COM_JOOMGALLERY_SUBIFD_EXPOSUREINDEX_DESCRIPTION" />
+
+    <field name="exif_sensingmethod"
+           type="list"
+           default="1"
+           label="COM_JOOMGALLERY_SUBIFD_SENSINGMETHOD"
+           description="COM_JOOMGALLERY_SUBIFD_SENSINGMETHOD_DESCRIPTION">
+         <option value="1">COM_JOOMGALLERY_SUBIFD_SENSINGMETHOD_1</option>
+         <option value="2">COM_JOOMGALLERY_SUBIFD_SENSINGMETHOD_2</option>
+         <option value="3">COM_JOOMGALLERY_SUBIFD_SENSINGMETHOD_3</option>
+         <option value="4">COM_JOOMGALLERY_SUBIFD_SENSINGMETHOD_4</option>
+         <option value="5">COM_JOOMGALLERY_SUBIFD_SENSINGMETHOD_5</option>
+         <option value="7">COM_JOOMGALLERY_SUBIFD_SENSINGMETHOD_7</option>
+         <option value="8">COM_JOOMGALLERY_SUBIFD_SENSINGMETHOD_8</option>
+    </field>
 
 </form>
