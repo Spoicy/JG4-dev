@@ -84,8 +84,8 @@
         <field name="ExposureBiasValue"
                type="text"
                pattern="^[+-]?\d+\/\d+$"
-               label="COM_JOOMGALLERY_SUBIFD_EXPOSEDBIASVALUE"
-               message="COM_JOOMGALLERY_SUBIFD_EXPOSEDBIASVALUE_DESCRIPTION" />
+               label="COM_JOOMGALLERY_SUBIFD_EXPOSUREBIASVALUE"
+               message="COM_JOOMGALLERY_SUBIFD_EXPOSUREBIASVALUE_DESCRIPTION" />
     
         <field name="MaxApertureValue"
                type="text"
@@ -161,7 +161,7 @@
              <option value="25">COM_JOOMGALLERY_SUBIFD_FLASH_25</option>
              <option value="29">COM_JOOMGALLERY_SUBIFD_FLASH_29</option>
              <option value="31">COM_JOOMGALLERY_SUBIFD_FLASH_31</option>
-             <option value="22">COM_JOOMGALLERY_SUBIFD_FLASH_22</option>
+             <option value="32">COM_JOOMGALLERY_SUBIFD_FLASH_32</option>
              <option value="48">COM_JOOMGALLERY_SUBIFD_FLASH_48</option>
              <option value="65">COM_JOOMGALLERY_SUBIFD_FLASH_65</option>
              <option value="69">COM_JOOMGALLERY_SUBIFD_FLASH_69</option>
