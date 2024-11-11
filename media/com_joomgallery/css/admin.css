@@ -240,3 +240,7 @@ joomla-field-image .jg_minithumb {
 .log-area .color-warning {
   color: var(--warning)
 }
+
+#fieldset-images-metadata > .control-group > .controls > .subform-wrapper > .control-group > .controls > .subform-wrapper > .control-group > .control-label {
+  display: none;
+}
