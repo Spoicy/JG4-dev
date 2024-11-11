@@ -1,25 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
     <fieldset name="general">
-        <field name="IFD0"
-               type="subform"
-               formsource="administrator/components/com_joomgallery/forms/subform_metadata_exif_ifd0.xml"
-               layout="joomla.form.field.subform.default"
-               label="IFD0" />
-    
-        <field name="exif_exposuretime"
+        <field name="ExposureTime"
                type="text"
                pattern="^\d+\/\d+$"
                label="COM_JOOMGALLERY_SUBIFD_EXPOSURETIME"
                message="COM_JOOMGALLERY_SUBIFD_EXPOSURETIME_DESCRIPTION" />
     
-        <field name="exif_fnumber"
+        <field name="FNumber"
                type="text"
                pattern="^\d+\/\d+$"
                label="COM_JOOMGALLERY_SUBIFD_FNUMBER"
                message="COM_JOOMGALLERY_SUBIFD_FNUMBER_DESCRIPTION" />
     
-        <field name="exif_exposureprogram"
+        <field name="ExposureProgram"
                type="list"
                default="1"
                label="COM_JOOMGALLERY_SUBIFD_EXPOSUREPROGRAM"
@@ -35,7 +29,7 @@
              <option value="8">COM_JOOMGALLERY_SUBIFD_EXPOSUREPROGRAM_8</option>
         </field>
     
-        <field name="exif_isospeedratings"
+        <field name="ISOSpeedRatings"
                type="number"
                min="0"
                max="65535"
@@ -43,19 +37,19 @@
                label="COM_JOOMGALLERY_SUBIFD_ISOSPEEDRATINGS"
                description="COM_JOOMGALLERY_SUBIFD_ISOSPEEDRATINGS_DESCRIPTION" />
     
-        <field name="exif_exifversion"
+        <field name="ExifVersion"
                type="text"
                pattern="^0\d{3}$"
                label="COM_JOOMGALLERY_SUBIFD_EXIFVERSION"
                message="COM_JOOMGALLERY_SUBIFD_EXIFVERSION_DESCRIPTION" />
     
-        <field name="exif_datetimeoriginal"
+        <field name="DateTimeOriginal"
                type="text"
                pattern="^[\x20-\x7E]*$"
                label="COM_JOOMGALLERY_SUBIFD_DATETIMEORIGINAL"
                message="COM_JOOMGALLERY_SUBIFD_DATETIMEORIGINAL_DESCRIPTION" />
     
-        <field name="exif_datetimedigitized"
+        <field name="DateTimeDigitized"
                type="text"
                pattern="^[\x20-\x7E]*$"
                label="COM_JOOMGALLERY_SUBIFD_DATETIMEDIGITIZED"
@@ -63,49 +57,49 @@
     
         <!-- ComponentConfiguration -->
     
-        <field name="exif_compressedbitsperpixel"
+        <field name="CompressedBitsPerPixel"
                type="text"
                pattern="^\d+\/\d+$"
                label="COM_JOOMGALLERY_SUBIFD_COMPRESSEDBITSPERPIXEL"
                message="COM_JOOMGALLERY_SUBIFD_COMPRESSEDBITSPERPIXEL_DESCRIPTION" />
     
-        <field name="exif_shutterspeedvalue"
+        <field name="ShutterSpeedValue"
                type="text"
                pattern="^[+-]?\d+\/\d+$"
                label="COM_JOOMGALLERY_SUBIFD_SHUTTERSPEEDVALUE"
                message="COM_JOOMGALLERY_SUBIFD_SHUTTERSPEEDVALUE_DESCRIPTION" />
     
-        <field name="exif_aperturevalue"
+        <field name="ApertureValue"
                type="text"
                pattern="^\d+\/\d+$"
                label="COM_JOOMGALLERY_SUBIFD_APERTUREVALUE"
                message="COM_JOOMGALLERY_SUBIFD_APERTUREVALUE_DESCRIPTION" />
     
-        <field name="exif_brightnessvalue"
+        <field name="BrightnessValue"
                type="text"
                pattern="^[+-]?\d+\/\d+$"
                label="COM_JOOMGALLERY_SUBIFD_BRIGHTNESSVALUE"
                message="COM_JOOMGALLERY_SUBIFD_BRIGHTNESSVALUE_DESCRIPTION" />
     
-        <field name="exif_exposurebiasvalue"
+        <field name="ExposureBiasValue"
                type="text"
                pattern="^[+-]?\d+\/\d+$"
                label="COM_JOOMGALLERY_SUBIFD_EXPOSEDBIASVALUE"
                message="COM_JOOMGALLERY_SUBIFD_EXPOSEDBIASVALUE_DESCRIPTION" />
     
-        <field name="exif_maxaperturevalue"
+        <field name="MaxApertureValue"
                type="text"
                pattern="^\d+\/\d+$"
                label="COM_JOOMGALLERY_SUBIFD_MAXAPERTUREVALUE"
                message="COM_JOOMGALLERY_SUBIFD_MAXAPERTUREVALUE_DESCRIPTION" />
     
-        <field name="exif_subjectdistance"
+        <field name="SubjectDistance"
                type="text"
                pattern="^[+-]?\d+\/\d+$"
                label="COM_JOOMGALLERY_SUBIFD_SUBJECTDISTANCE"
                message="COM_JOOMGALLERY_SUBIFD_SUBJECTDISTANCE_DESCRIPTION" />
     
-        <field name="exif_meteringmode"
+        <field name="MeteringMode"
                type="list"
                default="1"
                label="COM_JOOMGALLERY_SUBIFD_METERINGMODE"
@@ -120,7 +114,7 @@
              <option value="255">COM_JOOMGALLERY_SUBIFD_METERINGMODE_255</option>
         </field>
     
-        <field name="exif_lightsource"
+        <field name="LightSource"
                type="list"
                default="1"
                label="COM_JOOMGALLERY_SUBIFD_LIGHTSOURCE"
@@ -148,7 +142,7 @@
              <option value="255">COM_JOOMGALLERY_SUBIFD_LIGHTSOURCE_255</option>
         </field>
     
-        <field name="exif_flash"
+        <field name="Flash"
                type="list"
                default="1"
                label="COM_JOOMGALLERY_SUBIFD_FLASH"
@@ -183,13 +177,13 @@
              <option value="95">COM_JOOMGALLERY_SUBIFD_FLASH_95</option>
         </field>
     
-        <field name="exif_focallength"
+        <field name="FocalLength"
                type="text"
                pattern="^\d+\/\d+$"
                label="COM_JOOMGALLERY_SUBIFD_FOCALLENGTH"
                message="COM_JOOMGALLERY_SUBIFD_FOCALLENGTH_DESCRIPTION" />
     
-        <field name="exif_usercommentformat"
+        <field name="usercommentformat"
                type="list"
                default="1"
                label="COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT"
@@ -200,12 +194,12 @@
              <option value="Undefined">COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT_UNDEFINED</option>
         </field>
     
-        <field name="exif_usercomment"
+        <field name="UserComment"
                type="text"
                label="COM_JOOMGALLERY_SUBIFD_USERCOMMENT"
                message="COM_JOOMGALLERY_SUBIFD_USERCOMMENT_DESCRIPTION" />
     
-        <field name="exif_exifimagewidth"
+        <field name="ExifImageWidth"
                type="number"
                min="0"
                max="4294967295"
@@ -213,27 +207,27 @@
                label="COM_JOOMGALLERY_SUBIFD_EXIFIMAGEWIDTH"
                description="COM_JOOMGALLERY_SUBIFD_EXIFIMAGEWIDTH_DESCRIPTION" />
     
-        <field name="exif_exifimageheight"
+        <field name="ExifImageLength"
                type="number"
                min="0"
                max="4294967295"
                step="1"
-               label="COM_JOOMGALLERY_SUBIFD_EXIFIMAGEHEIGHT"
-               description="COM_JOOMGALLERY_SUBIFD_EXIFIMAGEHEIGHT_DESCRIPTION" />
+               label="COM_JOOMGALLERY_SUBIFD_EXIFIMAGELENGTH"
+               description="COM_JOOMGALLERY_SUBIFD_EXIFIMAGELENGTH_DESCRIPTION" />
     
-        <field name="exif_focalplanexresolution"
+        <field name="FocalPlaneXResolution"
                type="text"
                pattern="^\d+\/\d+$"
                label="COM_JOOMGALLERY_SUBIFD_FOCALPLANEXRESOLUTION"
                message="COM_JOOMGALLERY_SUBIFD_FOCALPLANEXRESOLUTION_DESCRIPTION" />
     
-        <field name="exif_focalplaneyresolution"
+        <field name="FocalPlaneYResolution"
                type="text"
                pattern="^\d+\/\d+$"
                label="COM_JOOMGALLERY_SUBIFD_FOCALPLANEYRESOLUTION"
                message="COM_JOOMGALLERY_SUBIFD_FOCALPLANEYRESOLUTION_DESCRIPTION" />
     
-        <field name="exif_focalplaneresolutionunit"
+        <field name="FocalPlaneResolutionUnit"
                type="list"
                default="1"
                label="COM_JOOMGALLERY_SUBIFD_FOCALPLANERESOLUTIONUNIT"
@@ -243,13 +237,13 @@
              <option value="3">COM_JOOMGALLERY_SUBIFD_FOCALPLANERESOLUTIONUNIT_3</option>
         </field>
     
-        <field name="exif_exposureindex"
+        <field name="ExposureIndex"
                type="text"
                pattern="^\d+\/\d+$"
                label="COM_JOOMGALLERY_SUBIFD_EXPOSUREINDEX"
                message="COM_JOOMGALLERY_SUBIFD_EXPOSUREINDEX_DESCRIPTION" />
     
-        <field name="exif_sensingmethod"
+        <field name="SensingMethod"
                type="list"
                default="1"
                label="COM_JOOMGALLERY_SUBIFD_SENSINGMETHOD"
