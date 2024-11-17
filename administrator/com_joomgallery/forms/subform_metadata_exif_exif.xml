@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<form>
+<form addfieldprefix="Joomgallery\Component\Joomgallery\Administrator\Field">
     <fieldset name="general">
         <field name="ExposureTime"
                type="text"
@@ -183,19 +183,8 @@
                label="COM_JOOMGALLERY_SUBIFD_FOCALLENGTH"
                message="COM_JOOMGALLERY_SUBIFD_FOCALLENGTH_DESCRIPTION" />
     
-        <field name="usercommentformat"
-               type="list"
-               default="1"
-               label="COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT"
-               description="COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT_DESCRIPTION">
-             <option value="ASCII">COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT_ASCII</option>
-             <option value="JIS">COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT_JIS</option>
-             <option value="Unicode">COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT_UNICODE</option>
-             <option value="Undefined">COM_JOOMGALLERY_SUBIFD_USERCOMMENTFORMAT_UNDEFINED</option>
-        </field>
-    
         <field name="UserComment"
-               type="text"
+               type="exifusercomment"
                label="COM_JOOMGALLERY_SUBIFD_USERCOMMENT"
                message="COM_JOOMGALLERY_SUBIFD_USERCOMMENT_DESCRIPTION" />
     
