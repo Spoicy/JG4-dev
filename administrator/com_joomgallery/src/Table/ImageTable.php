@@ -242,10 +242,16 @@ class ImageTable extends Table implements VersionableTableInterface
 			$array['params'] = (string) $registry;
 		}
 
-		if(isset($array['metadata']) && \is_array($array['metadata']))
+		if(isset($array['imgmetadata']) && \is_array($array['imgmetadata']))
 		{
-			$registry = new Registry($array['metadata']);
-			$array['metadata'] = (string) $registry;
+			$registry = new Registry($array['imgmetadata']);
+			
+			// Insert user comment format
+			$exif = $registry->get('exif');
+			$exif->EXIF->UserComment = str_pad('ASCII', 8, chr(0)) . $exif->EXIF->UserComment;
+			$registry->set('exif', $exif);
+
+			$array['imgmetadata'] = (string) $registry;
 		}
 
     // // Get access service
