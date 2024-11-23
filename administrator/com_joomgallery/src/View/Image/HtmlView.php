@@ -167,6 +167,11 @@ class HtmlView extends JoomGalleryView
 		{
 			ToolbarHelper::cancel('image.cancel', 'JTOOLBAR_CLOSE');
 		}
+
+    if(!empty($this->item->id))
+		{
+			ToolbarHelper::custom('image.savemetadata', 'save', '', 'Save metadata to file', false);
+		}
 	}
 
   /**
