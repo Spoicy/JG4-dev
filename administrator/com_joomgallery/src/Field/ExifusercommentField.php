@@ -81,9 +81,4 @@ class ExifusercommentField extends TextField
 
         return $this->getRenderer($this->layout)->render($data);
     }
-
-    public function postProcess($value, $group = null, Registry $input = null)
-    {
-        return str_pad('ASCII', 8, chr(0)) . $value;
-    }
 }

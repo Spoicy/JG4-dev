@@ -248,8 +248,10 @@ class ImageTable extends Table implements VersionableTableInterface
 			
 			// Insert user comment format
 			$exif = $registry->get('exif');
-			$exif->EXIF->UserComment = str_pad('ASCII', 8, chr(0)) . $exif->EXIF->UserComment;
-			$registry->set('exif', $exif);
+			if (isset($exif->EXIF->UserComment)) {
+				$exif->EXIF->UserComment = str_pad('ASCII', 8, chr(0)) . $exif->EXIF->UserComment;
+				$registry->set('exif', $exif);
+			}
 
 			$array['imgmetadata'] = (string) $registry;
 		}
