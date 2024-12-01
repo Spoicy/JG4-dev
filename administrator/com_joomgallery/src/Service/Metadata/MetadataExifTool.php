@@ -53,7 +53,7 @@ class MetadataExifTool extends BaseMetadata implements MetadataInterface
    * 
    * @since   4.0.0
    */
-  public function saveIptcEdit(string $img, array $edits): bool
+  public function writeToIptc(string $img, array $edits): bool
   {
     // Currently unimplemented, will be implemented.
     return false;

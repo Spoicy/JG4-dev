@@ -31,7 +31,12 @@ class Metadata implements MetadataInterface
     return false;
   }
 
-  public function copyMetadata($src_file, $dst_file, $src_imagetype, $dst_imgtype, $new_orient, $bak): bool {
+  public function copyMetadata($src_file, $dst_file, $src_imagetype, $dst_imgtype, $new_orient, $bak) {
+    return false;
+  }
+
+  public function writeMetadata($img, $imgmetadata): bool
+  {
     return false;
   }
 
@@ -59,7 +64,7 @@ class Metadata implements MetadataInterface
    * 
    * @since   4.0.0
    */
-  public function saveIptcEdit(string $img, array $edits): bool {
+  public function writeToIptc(string $img, array $edits): bool {
     return false;
   }
 

@@ -1147,7 +1147,7 @@ class ImageModel extends JoomAdminModel
       $this->component->createMetadata($this->component->getConfig()->get('jg_metaprocessor', 'php'));
 
       // Perfrom the save using the metadata service
-      //$this->component->getMetadata()->saveIptcEdit("", $array);
+      $this->component->getMetadata()->writeMetadata("", $array);
     }
     else
     {

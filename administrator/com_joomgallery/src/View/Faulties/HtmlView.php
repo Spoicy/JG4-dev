@@ -53,14 +53,17 @@ class HtmlView extends JoomGalleryView
 
 		// Development code for Metadata Service
 		$this->component->createMetadata($processor);
-		$arrayExif = array();
-		$arrayExif[PelTag::MAKE] = "Nikon10";
-		$arrayIptc = array();
-		$arrayIptc["2#090"] = "Bern";
-		$arrayIptc["2#095"] = "Switzerland";
-		echo $this->component->getMetadata()->saveExifEdit(__DIR__ . '/Nikon_COOLPIX_P1.jpg', $arrayExif);
 
-		echo $this->component->getMetadata()->saveIptcEdit(__DIR__ . '/Nikon_COOLPIX_P1.jpg', $arrayIptc);
+		echo $this->component->getMetadata()->copyMetadata(__DIR__ . '/Nikon_COOLPIX_P1.jpg', __DIR__ . '/Ricoh_Caplio_RR330.jpg', "JPG", "JPG", false, false);
+
+		// $arrayExif = array();
+		// $arrayExif[PelTag::MAKE] = "Nikon10";
+		// $arrayIptc = array();
+		// $arrayIptc["2#090"] = "Bern";
+		// $arrayIptc["2#095"] = "Switzerland";
+		// echo $this->component->getMetadata()->saveExifEdit(__DIR__ . '/Nikon_COOLPIX_P1.jpg', $arrayExif);
+
+		// echo $this->component->getMetadata()->saveIptcEdit(__DIR__ . '/Nikon_COOLPIX_P1.jpg', $arrayIptc);
 		
 		//var_dump($this->component->getMetadata()->readJpegMetadata(__DIR__ . '/Nikon_COOLPIX_P1.jpg'));
 

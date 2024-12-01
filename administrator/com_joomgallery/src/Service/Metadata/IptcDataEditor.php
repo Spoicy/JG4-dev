@@ -131,13 +131,13 @@ class IptcDataEditor
         return $retval . $value;
     }
 
-    public function appendTags(array $app13, string $tags): string {
+    public function convertIptcToString(array $app13): string {
         $retval = "";
         foreach ($app13 as $tag => $value) {
             var_dump($value);
             $explode = explode("#", $tag);
             $retval .= self::makeTag(intval($explode[0]), intval($explode[1]), $value[0]);
         }
-        return $retval . $tags;
+        return $retval;
     }
 }

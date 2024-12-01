@@ -101,63 +101,60 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    * Writes a list of values to the exif metadata of an image
    * 
    * @param   string $img   Path to the image 
-   * @param   array  $edits Array of edits to be made to the metadata
+   * @param   array  $edits The "exif" portion of the imgmetadata array
    * 
    * @return  bool          True on success, false on failure
    * 
    * @since   4.0.0
    */
-  public function writeToExif(string $img, array $edits): bool {
+  public function writeToExif(string $img, array $edits): bool
+  {
     $file = file_get_contents($img);
     $data = new PelDataWindow($file);
 
     if (PelJpeg::isValid($data)) {
+      // Getting initial 
       $jpeg = $file = new PelJpeg();
       $jpeg->load($data);
       $exifdata = $jpeg->getExif();
-      // Check if APP1 section exists, create if not along with tiff
+      // Check if APP1 section exists, create if not.
       if ($exifdata == null) {
         $exifdata = new PelExif();
         $jpeg->setExif($exifdata);
-        $tiff = new PelTiff();
-        $exifdata->setTiff($tiff);
       }
-      $tiff = $exifdata->getTiff();
-    } elseif (PelTiff::isValid($data)) {
-      // Data was recognized as TIFF. PelTiff/Ifd is what is being edited regardless.
-      $tiff = $file = new PelTiff();
-      $tiff->load($data);
+
+      // Setting a blank slate for the exif data. TIFF will be set at the end of method.
+      $tiff = new PelTiff();
+      $ifd0 = new PelIfd(PelIfd::IFD0);
+      $subIfd = new PelIfd(PelIfd::EXIF);
+      $ifd0->addSubIfd($subIfd);
+      $tiff->setIfd($ifd0);
     } else {
-      // Handle invalid data
+      // Invalid image format. TIFF images could be supported if desired.
       return false;
     }
-    // Grab the root IFD from the TIFF. IFDs are what is actually being edited.
-    $ifd0 = $tiff->getIfd();
-    if ($ifd0 == null) {
-      // Image did not contain an IFD, so no former Exif data, populate with an empty IFD
-      $ifd0 = new PelIfd(PelIfd::IFD0);
-      $tiff->setIfd($ifd0);
-    }
-    // The majority of EXIF data is stored in the sub IFD
-    $subIfd = $ifd0->getSubIfd(PelIfd::EXIF);
     $editor = new PelDataEditor();
+
     // Cycle through all the necessary edits and perform them
-    foreach ($edits as $tag => $edit) {
-      if (!isset(self::$entryTypes[$tag])) {
-        // Address does not reference a tag
+    foreach ($edits['IFD0'] as $name => $edit) {
+      if (!isset(self::$entryTypes[PelTag::getExifTagByName($name)])) {
+        // Address does not reference a listed tag.
         continue;
-        // TODO: Handle this properly
       }
-      // Check if edit should take place on the root or the sub IFD.
-      if ($tag <= 33432) {
-        $editor->makeEdit($ifd0, $tag, $edit, self::$entryTypes[$tag]);
-      } else {
-        $editor->makeEdit($subIfd, $tag, $edit, self::$entryTypes[$tag]);
-      }
+      $tag = PelTag::getExifTagByName($name);
+      $editor->makeEdit($ifd0, $tag, $edit, self::$entryTypes[$tag]);
     }
-    echo $ifd0->getEntry(PelTag::MAKE)->getValue();
-    $test = $file->saveFile($img);
-    var_dump($test);
+    foreach ($edits['EXIF'] as $name => $edit) {
+      if (!isset(self::$entryTypes[PelTag::getExifTagByName($name)])) {
+        // Address does not reference a listed tag.
+        continue;
+      }
+      $tag = PelTag::getExifTagByName($name);
+      $editor->makeEdit($subIfd, $tag, $edit, self::$entryTypes[$tag]);
+    }
+
+    $exifdata->setTiff($tiff);
+    $file->saveFile($img);
     return true;
   }
 
@@ -170,7 +167,8 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    * 
    * @since 4.0.0
    */
-  private function getPelImageObjects(string $img) {
+  private function getPelImageObjects(string $img)
+  {
     $file = file_get_contents($img);
     $data = new PelDataWindow($file);
     if (PelJpeg::isValid($data)) {
@@ -190,7 +188,6 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
       $tiff = $file = new PelTiff();
       $tiff->load($data);
     } else {
-      echo "wuh";
       // Handle invalid data
       return false;
     }
@@ -201,8 +198,13 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    * Reads the metadata from an image.
    * (Current supported image formats: JPEG)
    * (Current supported metadata formats: EXIF/IPTC)
+   * 
+   * @param  string $file  Path to the file 
+   * 
+   * @return array  Metadata as array
    */
-  public function readMetadata(string $file) {
+  public function readMetadata(string $file)
+  {
     return self::readJpegMetadata($file);
   }
 
@@ -215,13 +217,14 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    * 
    * @since 4.0.0
    */
-  public function readJpegMetadata(string $file) {
-    $metadata = array('exif' => array(), 'iptc' => array(), 'comment' => array());
+  public function readJpegMetadata(string $file)
+  {
+    // Output to the same format as before. Comment field has been left out on purpose.
+    $metadata = array('exif' => array(), 'iptc' => array());
     $size = getimagesize($file, $info);
 
     // EXIF with PEL
     $imageObjects = self::getPelImageObjects($file);
-
     if ($imageObjects == false) {
       return;
     }
@@ -240,6 +243,7 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
         }
       }
     }
+
     // IPTC
     if (isset($info["APP13"])) {
       $iptc = iptcparse($info['APP13']);
@@ -252,8 +256,13 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
   
   /**
    * Formats a PelEntry variant to be stored in a displayable format for the imgmetadata form.
+   * 
+   * @param  mixed $entry  Variant of the PelEntry class
+   * 
+   * @return mixed Value of the entry
    */
-  private function formatPELEntryForForm($entry) {
+  private function formatPELEntryForForm($entry)
+  {
     if ($entry instanceof PelEntryRational || $entry instanceof PelEntrySRational) {
       // Rationals are retrieved/stored as an array, they need to be reformatted for the form.
       $numbers = $entry->getValue();
@@ -269,21 +278,77 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
   }
 
   /**
+   * Copy image metadata depending on file type (Supported: JPG,PNG / EXIF,IPTC)
+   *
+   * @param   string  $src_file        Path to source file
+   * @param   string  $dst_file        Path to destination file
+   * @param   string  $src_imagetype   Type of the source image file
+   * @param   string  $dst_imgtype     Type of the destination image file
+   * @param   int     $new_orient      New exif orientation (false: do not change exif orientation)
+   * @param   bool    $bak             true, if a backup-file should be created if $src_file=$dst_file
+   *
+   * @return  int     number of bytes written on success, false otherwise
+   *
+   * @since   3.5.0
+   */
+  public function copyMetadata($src_file, $dst_file, $src_imagetype, $dst_imgtype, $new_orient, $bak)
+  {
+    $backupFile = false;
+
+    if ($src_file == $dst_file && $bak) {
+      if (!File::copy($src_file, $src_file . 'bak')) {
+        return false;
+      }
+
+      $backupFile = true;
+      $src_file   = $src_file . 'bak';
+    }
+
+    if ($src_imagetype == 'JPG' && $dst_imgtype == 'JPG') {
+      $successExif = self::copyExifData($src_file, $dst_file, $new_orient);
+      $successIptc = self::copyIptcData($src_file, $dst_file);
+      $success = $successExif + $successIptc;
+    } else {
+      if ($src_imagetype == 'PNG' && $dst_imgtype == 'PNG') {
+        $success = $this->copyPNGmetadata($src_file, $dst_file);
+      } else {
+        // In all other cases dont copy metadata
+        $success = true;
+      }
+    }
+
+    if ($backupFile) {
+      File::delete($src_file);
+    }
+
+    return $success;
+  }
+
+  /**
    * Copies the metadata from one file to another with PEL.
    * 
-   * @param  string $srcPath Path to source file
-   * @param  string $dstPath Path to destination file
+   * @param  string $srcPath    Path to source file
+   * @param  string $dstPath    Path to destination file
+   * @param  int    $newOrient  New exif orientation (false: do not change exif orientation)
    * 
    * @return int
    * 
    * @since 4.0.0
    */
-  public function copyExifData($srcPath, $dstPath) {
+  public function copyExifData($srcPath, $dstPath, $newOrient = false)
+  {
+    $editor = new PelDataEditor();
+
     $srcImageObjects = self::getPelImageObjects($srcPath);
     if ($srcImageObjects == false) {
       return false;
     }
     $srcPelTiff = $srcImageObjects["tiff"];
+    if ($newOrient != false) {
+      $ifd0 = $srcPelTiff->getIfd(PelIfd::IFD0);
+      $editor->makeEdit($ifd0, PelTag::ORIENTATION, $newOrient, PelFormat::SHORT);
+    }
+
     $dstImageObjects = self::getPelImageObjects($dstPath);
     if ($dstImageObjects == false) {
       return false;
@@ -292,12 +357,28 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     if ($dstPelFile instanceof PelJpeg) {
       $exifdata = $dstPelFile->getExif();
       $exifdata->setTiff($srcPelTiff);
-      echo $exifdata->getTiff();
     } else {
       // TIFF not currently supported
       return false;
     }
     return $dstPelFile->saveFile($dstPath);
+  }
+
+  public function copyIptcData($srcPath, $dstPath)
+  {
+    $editor = new IptcDataEditor();
+    $srcSize = getimagesize($srcPath, $srcInfo);
+    if (!isset($srcInfo['APP13'])) {
+      return true;
+    }
+    $srcIptc = iptcparse($srcInfo['APP13']);
+    $tagString = $editor->convertIptcToString($srcIptc);
+
+    $content = iptcembed($tagString, $dstPath);
+    $fp = fopen($dstPath, "wb");
+    $success = fwrite($fp, $content);
+    fclose($fp);
+    return $success;
   }
 
   /**
@@ -418,7 +499,7 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
   }
 
   /**
-   * Saves an edit to the iptc metadata of an image
+   * Writes a list of values to the iptc metadata of an image
    * 
    * @param   string $img   Path to the image 
    * @param   array  $edits Array of edits to be made to the metadata
@@ -427,16 +508,19 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    * 
    * @since   4.0.0
    */
-  public function saveIptcEdit(string $img, array $edits): bool {
+  public function writeToIptc(string $img, array $edits): bool
+  {
+    if (count($edits) <= 0) {
+      return true;
+    }
+
     $editor = new IptcDataEditor();
     $tagString = "";
     foreach ($edits as $tag => $edit) {
       $tagString .= $editor->createEdit($tag, $edit);
     }
-    $tagString = $editor->createEdit("2#090", "London");
-    $tagString .= $editor->createEdit("2#095", "England");
-    $content = iptcembed($tagString, $img);
 
+    $content = iptcembed($tagString, $img);
     $fp = fopen($img, "wb");
     fwrite($fp, $content);
     fclose($fp);
@@ -455,7 +539,8 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    * 
    * @since   4.0.0
    */
-  public function saveXmpEdit(string $img, array $edits): bool {
+  public function saveXmpEdit(string $img, array $edits): bool
+  {
     // This function is currently not implemented. Potentially out of scope for the WIPRO project.
     return false;
   }
