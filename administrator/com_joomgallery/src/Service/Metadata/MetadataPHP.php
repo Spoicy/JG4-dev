@@ -21,6 +21,10 @@ use \Joomgallery\Component\Joomgallery\Administrator\Service\Metadata\Metadata a
 use \lsolesen\pel\Pel;
 use \lsolesen\pel\PelDataWindow;
 use \lsolesen\pel\PelEntryAscii;
+use lsolesen\pel\PelEntryCopyright;
+use lsolesen\pel\PelEntryRational;
+use lsolesen\pel\PelEntrySRational;
+use lsolesen\pel\PelEntryTime;
 use \lsolesen\pel\PelExif;
 use \lsolesen\pel\PelFormat;
 use \lsolesen\pel\PelIfd;
@@ -94,7 +98,7 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
   ];
 
   /**
-   * Saves an edit to the exif metadata of an image
+   * Writes a list of values to the exif metadata of an image
    * 
    * @param   string $img   Path to the image 
    * @param   array  $edits Array of edits to be made to the metadata
@@ -103,16 +107,30 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    * 
    * @since   4.0.0
    */
-  public function saveExifEdit(string $img, array $edits): bool {
-    // Temporary until form
-    $file = file_get_contents(__DIR__ . "/Ricoh_Caplio_RR330.jpg");
+  public function writeToExif(string $img, array $edits): bool {
+    $file = file_get_contents($img);
+    $data = new PelDataWindow($file);
 
-    $imageObjects = self::getPelImageObjects($file);
-    if ($imageObjects == false) {
+    if (PelJpeg::isValid($data)) {
+      $jpeg = $file = new PelJpeg();
+      $jpeg->load($data);
+      $exifdata = $jpeg->getExif();
+      // Check if APP1 section exists, create if not along with tiff
+      if ($exifdata == null) {
+        $exifdata = new PelExif();
+        $jpeg->setExif($exifdata);
+        $tiff = new PelTiff();
+        $exifdata->setTiff($tiff);
+      }
+      $tiff = $exifdata->getTiff();
+    } elseif (PelTiff::isValid($data)) {
+      // Data was recognized as TIFF. PelTiff/Ifd is what is being edited regardless.
+      $tiff = $file = new PelTiff();
+      $tiff->load($data);
+    } else {
+      // Handle invalid data
       return false;
     }
-    $file = $imageObjects["file"];
-    $tiff = $imageObjects["tiff"];
     // Grab the root IFD from the TIFF. IFDs are what is actually being edited.
     $ifd0 = $tiff->getIfd();
     if ($ifd0 == null) {
@@ -137,21 +155,23 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
         $editor->makeEdit($subIfd, $tag, $edit, self::$entryTypes[$tag]);
       }
     }
-    
-    $file->saveFile(__DIR__ . "/Ricoh_Caplio_RR330.jpg");
+    echo $ifd0->getEntry(PelTag::MAKE)->getValue();
+    $test = $file->saveFile($img);
+    var_dump($test);
     return true;
   }
 
   /**
    * Gets the jpeg/tiff objects from a valid JPEG or TIFF image with PEL.
    * 
-   * @param  string $file   The image data
+   * @param  string $img    The image data
    * 
    * @return array|false    File and tiff objects on success, false on failure.
    * 
    * @since 4.0.0
    */
-  private function getPelImageObjects(string $file): array {
+  private function getPelImageObjects(string $img) {
+    $file = file_get_contents($img);
     $data = new PelDataWindow($file);
     if (PelJpeg::isValid($data)) {
       $jpeg = $file = new PelJpeg();
@@ -170,10 +190,20 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
       $tiff = $file = new PelTiff();
       $tiff->load($data);
     } else {
+      echo "wuh";
       // Handle invalid data
       return false;
     }
     return ["file" => $file, "tiff" => $tiff];
+  }
+
+  /**
+   * Reads the metadata from an image.
+   * (Current supported image formats: JPEG)
+   * (Current supported metadata formats: EXIF/IPTC)
+   */
+  public function readMetadata(string $file) {
+    return self::readJpegMetadata($file);
   }
 
   /**
@@ -187,9 +217,11 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    */
   public function readJpegMetadata(string $file) {
     $metadata = array('exif' => array(), 'iptc' => array(), 'comment' => array());
+    $size = getimagesize($file, $info);
 
     // EXIF with PEL
     $imageObjects = self::getPelImageObjects($file);
+
     if ($imageObjects == false) {
       return;
     }
@@ -198,27 +230,42 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     if ($ifd0 != null) {
       $metadata['exif']['IFD0'] = array();
       foreach ($ifd0->getEntries() as $entry) {
-        $metadata['exif']['IFD0'][PelTag::getName(PelIfd::IFD0, $entry->getTag())] = $entry->getValue();
+        $metadata['exif']['IFD0'][PelTag::getName(PelIfd::IFD0, $entry->getTag())] = self::formatPELEntryForForm($entry);
       }
-      $subIfd = $ifd0->getSubIfd();
+      $subIfd = $ifd0->getSubIfd(PelIfd::EXIF);
       if ($subIfd != null) {
         $metadata['exif']['EXIF'] = array();
         foreach ($subIfd->getEntries() as $entry) {
-          $metadata['exif']['EXIF'][PelTag::getName(PelIfd::IFD0, $entry->getTag())] = $entry->getValue();
+          $metadata['exif']['EXIF'][PelTag::getName(PelIfd::EXIF, $entry->getTag())] = self::formatPELEntryForForm($entry);
         }
       }
     }
-
     // IPTC
-    $size = getimagesize($file, $info);
     if (isset($info["APP13"])) {
       $iptc = iptcparse($info['APP13']);
       foreach ($iptc as $key => $value) {
         $metadata['iptc'][$key] = $value[0];
       }
     }
-
     return $metadata;
+  }
+  
+  /**
+   * Formats a PelEntry variant to be stored in a displayable format for the imgmetadata form.
+   */
+  private function formatPELEntryForForm($entry) {
+    if ($entry instanceof PelEntryRational || $entry instanceof PelEntrySRational) {
+      // Rationals are retrieved/stored as an array, they need to be reformatted for the form.
+      $numbers = $entry->getValue();
+      return $entry->formatNumber($numbers);
+    } elseif ($entry instanceof PelEntryCopyright) {
+      // Copyright is stored in PEL as an array, it needs to be reformatted for the form.
+      return $entry->getText();
+    } elseif ($entry instanceof PelEntryTime) {
+      return $entry->getValue(PelEntryTime::EXIF_STRING);
+    } else {
+      return $entry->getValue();
+    }
   }
 
   /**
@@ -232,14 +279,12 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    * @since 4.0.0
    */
   public function copyExifData($srcPath, $dstPath) {
-    $srcFile = file_get_contents($srcPath);
-    $dstFile = file_get_contents($dstPath);
-    $srcImageObjects = self::getPelImageObjects($srcFile);
+    $srcImageObjects = self::getPelImageObjects($srcPath);
     if ($srcImageObjects == false) {
       return false;
     }
     $srcPelTiff = $srcImageObjects["tiff"];
-    $dstImageObjects = self::getPelImageObjects($dstFile);
+    $dstImageObjects = self::getPelImageObjects($dstPath);
     if ($dstImageObjects == false) {
       return false;
     }
@@ -247,11 +292,129 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     if ($dstPelFile instanceof PelJpeg) {
       $exifdata = $dstPelFile->getExif();
       $exifdata->setTiff($srcPelTiff);
+      echo $exifdata->getTiff();
     } else {
       // TIFF not currently supported
       return false;
     }
     return $dstPelFile->saveFile($dstPath);
+  }
+
+  /**
+   * Copy iTXt, tEXt and zTXt chunks of a png from source to destination image
+   *
+   * read chunks; adapted from
+   * Author: Andrew Moore
+   * Website: https://stackoverflow.com/questions/2190236/how-can-i-read-png-metadata-from-php
+   *
+   * write chunks; adapted from
+   * Author: leonbloy
+   * Website: https://stackoverflow.com/questions/8842387/php-add-itxt-comment-to-a-png-image
+   *
+   * @param   string  $src_file        Path to source file
+   * @param   string  $dst_file        Path to destination file
+   *
+   * @return  int     number of bytes written on success, false otherwise
+   *
+   * @since   3.5.0
+   */
+  protected function copyPNGmetadata($src_file, $dst_file)
+  {
+    if (\file_exists($src_file) && \file_exists($dst_file)) {
+      $_src_chunks = array();
+      $_fp         = \fopen($src_file, 'r');
+      $chunks      = array();
+
+      if (!$_fp) {
+        // Unable to open file
+        return false;
+      }
+
+      // Read the magic bytes and verify
+      $header = \fread($_fp, 8);
+
+      if ($header != "\x89PNG\x0d\x0a\x1a\x0a") {
+        // Not a valid PNG image
+        return false;
+      }
+
+      // Loop through the chunks. Byte 0-3 is length, Byte 4-7 is type
+      $chunkHeader = \fread($_fp, 8);
+      while ($chunkHeader) {
+        // Extract length and type from binary data
+        $chunk = @\unpack('Nsize/a4type', $chunkHeader);
+
+        // Store position into internal array
+        if (!\key_exists($chunk['type'], $_src_chunks)) {
+          $_src_chunks[$chunk['type']] = array();
+        }
+
+        $_src_chunks[$chunk['type']][] = array(
+          'offset' => \ftell($_fp),
+          'size' => $chunk['size']
+        );
+
+        // Skip to next chunk (over body and CRC)
+        \fseek($_fp, $chunk['size'] + 4, SEEK_CUR);
+
+        // Read next chunk header
+        $chunkHeader = \fread($_fp, 8);
+      }
+
+      // Read iTXt chunk
+      if (isset($_src_chunks['iTXt'])) {
+        foreach ($_src_chunks['iTXt'] as $chunk) {
+          if ($chunk['size'] > 0) {
+            \fseek($_fp, $chunk['offset'], SEEK_SET);
+            $chunks['iTXt'] = \fread($_fp, $chunk['size']);
+          }
+        }
+      }
+
+      // Read tEXt chunk
+      if (isset($_src_chunks['tEXt'])) {
+        foreach ($_src_chunks['tEXt'] as $chunk) {
+          if ($chunk['size'] > 0) {
+            \fseek($_fp, $chunk['offset'], SEEK_SET);
+            $chunks['tEXt'] = \fread($_fp, $chunk['size']);
+          }
+        }
+      }
+
+      // Read zTXt chunk
+      if (isset($_src_chunks['zTXt'])) {
+        foreach ($_src_chunks['zTXt'] as $chunk) {
+          if ($chunk['size'] > 0) {
+            \fseek($_fp, $chunk['offset'], SEEK_SET);
+            $chunks['zTXt'] = \fread($_fp, $chunk['size']);
+          }
+        }
+      }
+
+      // Write chucks to destination image
+      $_dfp = \file_get_contents($dst_file);
+      $data = '';
+
+      if (isset($chunks['iTXt'])) {
+        $data .= \pack("N", \strlen($chunks['iTXt'])) . 'iTXt' . $chunks['iTXt'] . \pack("N", \crc32('iTXt' . $chunks['iTXt']));
+      }
+
+      if (isset($chunks['tEXt'])) {
+        $data .= \pack("N", \strlen($chunks['tEXt'])) . 'tEXt' . $chunks['tEXt'] . \pack("N", \crc32('tEXt' . $chunks['tEXt']));
+      }
+
+      if (isset($chunks['zTXt'])) {
+        $data .= \pack("N", \strlen($chunks['zTXt'])) . 'zTXt' . $chunks['zTXt'] . \pack("N", \crc32('zTXt' . $chunks['zTXt']));
+      }
+
+      $len = \strlen($_dfp);
+      $png = \substr($_dfp, 0, $len - 12) . $data . \substr($_dfp, $len - 12, 12);
+
+      return \file_put_contents($dst_file, $png);
+    } else {
+      // File doesn't exist
+      return false;
+    }
   }
 
   /**
@@ -266,16 +429,15 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
    */
   public function saveIptcEdit(string $img, array $edits): bool {
     $editor = new IptcDataEditor();
-    $size = getimagesize(__DIR__ . "/IPTC-GoogleImgSrcPmd_testimg012.jpg", $info);
-    $iptc = iptcparse($info['APP13']);
-    var_dump($iptc);
-    return false;
+    $tagString = "";
+    foreach ($edits as $tag => $edit) {
+      $tagString .= $editor->createEdit($tag, $edit);
+    }
     $tagString = $editor->createEdit("2#090", "London");
     $tagString .= $editor->createEdit("2#095", "England");
-    //$appendedString = $editor->appendTags($iptc, $tagString);
-    $content = iptcembed($tagString, __DIR__ . "/IPTC-GoogleImgSrcPmd_testimg01.jpg");
+    $content = iptcembed($tagString, $img);
 
-    $fp = fopen(__DIR__ . "/IPTC-GoogleImgSrcPmd_testimg01.jpg", "wb");
+    $fp = fopen($img, "wb");
     fwrite($fp, $content);
     fclose($fp);
     return true;

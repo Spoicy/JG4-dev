@@ -53,7 +53,21 @@ class HtmlView extends JoomGalleryView
 
 		// Development code for Metadata Service
 		$this->component->createMetadata($processor);
-		$array = array();
+		$arrayExif = array();
+		$arrayExif[PelTag::MAKE] = "Nikon10";
+		$arrayIptc = array();
+		$arrayIptc["2#090"] = "Bern";
+		$arrayIptc["2#095"] = "Switzerland";
+		echo $this->component->getMetadata()->saveExifEdit(__DIR__ . '/Nikon_COOLPIX_P1.jpg', $arrayExif);
+
+		echo $this->component->getMetadata()->saveIptcEdit(__DIR__ . '/Nikon_COOLPIX_P1.jpg', $arrayIptc);
+		
+		//var_dump($this->component->getMetadata()->readJpegMetadata(__DIR__ . '/Nikon_COOLPIX_P1.jpg'));
+
+		// echo $this->component->getMetadata()->copyExifData(__DIR__ . '/Ricoh_Caplio_RR330.jpg', __DIR__ . '/Nikon_COOLPIX_P1.jpg');
+		// echo $this->component->getMetadata()->readJpegMetadata(__DIR__ . '/Ricoh_Caplio_RR330.jpg');
+		// echo $this->component->getMetadata()->readJpegMetadata(__DIR__ . '/Nikon_COOLPIX_P1.jpg');
+
 		/*$array[PelTag::IMAGE_DESCRIPTION] = "Testing";
 		$array[PelTag::ORIENTATION] = 1;
 		$array[PelTag::FNUMBER] = [287, 100];
@@ -61,7 +75,7 @@ class HtmlView extends JoomGalleryView
 		$array[PelTag::SUBJECT_DISTANCE] = [2, 1];
 		$array[PelTag::USER_COMMENT] = "This is a user comment.";*/
 		//echo $this->component->getMetadata()->saveExifEdit("", $array);
-		echo $this->component->getMetadata()->saveIptcEdit("", $array);
+		
 
     return;
 

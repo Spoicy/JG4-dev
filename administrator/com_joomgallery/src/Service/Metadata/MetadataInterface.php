@@ -21,16 +21,17 @@ namespace Joomgallery\Component\Joomgallery\Administrator\Service\Metadata;
 interface MetadataInterface
 {
   /**
-   * First method
-   *
-   * @return  string
-   *
-   * @since   4.0.0
+   * 
    */
-  public function hello(): string;
+  public function readMetadata(string $file);
 
   /**
-   * Saves an edit to the exif metadata of an image
+   * 
+   */
+  public function copyMetadata($src_file, $dst_file, $src_imagetype, $dst_imgtype, $new_orient, $bak): bool;
+
+  /**
+   * Writes a list of values to the exif metadata of an image
    * 
    * @param   string $img   Path to the image 
    * @param   array $edits  Array of edits to be made to the metadata
@@ -39,7 +40,7 @@ interface MetadataInterface
    * 
    * @since   4.0.0
    */
-  public function saveExifEdit(string $img, array $edits): bool;
+  public function writeToExif(string $img, array $edits): bool;
 
   /**
    * Saves an edit to the iptc metadata of an image

@@ -27,20 +27,16 @@ class Metadata implements MetadataInterface
 {
   use ServiceTrait;
 
-  /**
-   * First method
-   *
-   * @return  string
-   *
-   * @since   4.0.0
-   */
-  public function hello(): string
-  {
-    return 'Hello from Metadata-Service...';
+  public function readMetadata(string $file) {
+    return false;
+  }
+
+  public function copyMetadata($src_file, $dst_file, $src_imagetype, $dst_imgtype, $new_orient, $bak): bool {
+    return false;
   }
 
   /**
-   * Saves an edit to the exif metadata of an image
+   * Writes a list of values to the exif metadata of an image
    * 
    * @param   string $img   Path to the image 
    * @param   array $edits  Array of edits to be made to the metadata
@@ -49,7 +45,7 @@ class Metadata implements MetadataInterface
    * 
    * @since   4.0.0
    */
-  public function saveExifEdit(string $img, array $edits): bool {
+  public function writeToExif(string $img, array $edits): bool {
     return false;
   }
 

@@ -29,19 +29,7 @@ class MetadataExifTool extends BaseMetadata implements MetadataInterface
   use ServiceTrait;
 
   /**
-   * First method
-   *
-   * @return  string
-   *
-   * @since   4.0.0
-   */
-  public function hello(): string
-  {
-    return 'Hello from the <b>ExifTool</b> version of the Metadata-Service...';
-  }
-
-  /**
-   * Saves an edit to the exif metadata of an image
+   * Writes a list of values to the exif metadata of an image
    * 
    * @param   string $img   Path to the image 
    * @param   array $edits  Array of edits to be made to the metadata
@@ -50,7 +38,7 @@ class MetadataExifTool extends BaseMetadata implements MetadataInterface
    * 
    * @since   4.0.0
    */
-  public function saveExifEdit(string $img, array $edits): bool
+  public function writeToExif(string $img, array $edits): bool
   {
     return false;
   }

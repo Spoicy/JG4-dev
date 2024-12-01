@@ -133,7 +133,6 @@ class IptcDataEditor
 
     public function appendTags(array $app13, string $tags): string {
         $retval = "";
-        return false;
         foreach ($app13 as $tag => $value) {
             var_dump($value);
             $explode = explode("#", $tag);
