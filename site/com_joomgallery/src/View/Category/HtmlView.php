@@ -16,6 +16,7 @@ defined('_JEXEC') or die;
 
 use \Joomla\CMS\Language\Text;
 use \Joomla\CMS\MVC\View\GenericDataException;
+use \Joomgallery\Component\Joomgallery\Administrator\Helper\JoomHelper;
 use \Joomgallery\Component\Joomgallery\Administrator\View\JoomGalleryView;
 
 /**
@@ -71,19 +72,23 @@ class HtmlView extends JoomGalleryView
       $this->app->enqueueMessage(Text::_('COM_JOOMGALLERY_ERROR_ACCESS_VIEW'), 'error');
     }
 
-    // Load parent category
-    $this->item->parent = $this->get('Parent');
+		// Load only if category is currently not protected
+		if(!$this->item->pw_protected)
+		{
+			// Load parent category
+			$this->item->parent = $this->get('Parent');
 
-    // Load subcategories
-    $this->item->children = new \stdClass();
-    $this->item->children->items = $this->get('Children');
-
-    // Load images
-    $this->item->images = new \stdClass();
-    $this->item->images->items         = $this->get('Images');
-    $this->item->images->pagination    = $this->get('ImagesPagination');
-		$this->item->images->filterForm    = $this->get('ImagesFilterForm');
-		$this->item->images->activeFilters = $this->get('ImagesActiveFilters');
+			// Load subcategories
+			$this->item->children = new \stdClass();
+			$this->item->children->items = $this->get('Children');
+	
+			// Load images
+			$this->item->images = new \stdClass();
+			$this->item->images->items         = $this->get('Images');
+			$this->item->images->pagination    = $this->get('ImagesPagination');
+			$this->item->images->filterForm    = $this->get('ImagesFilterForm');
+			$this->item->images->activeFilters = $this->get('ImagesActiveFilters');
+		}
 
     // Check for errors.
 		if(\count($errors = $this->get('Errors')))
@@ -150,20 +155,42 @@ class HtmlView extends JoomGalleryView
 			$this->document->setMetadata('robots', $this->params['menu']->get('robots'));
 		}
 
-    // Add Breadcrumbs
-    $pathway = $this->app->getPathway();
-    $breadcrumbList = Text::_('COM_JOOMGALLERY_CATEGORIES');
-
-    if(!\in_array($breadcrumbList, $pathway->getPathwayNames()))
+    // Get ID of the category from active menu item
+    if($this->menu && $this->menu->component == _JOOM_OPTION && isset($this->menu->query['view']) && in_array($this->menu->query['view'], ['categories', 'category']))
     {
-      $pathway->addItem($breadcrumbList, "index.php?option=com_joomgallery&view=categories");
+      $id = $this->menu->query['id'];
+    }
+    else
+    {
+      $id = 1;
     }
 
-    $breadcrumbTitle = Text::_('JCATEGORY');
+		if(!$this->isMenuCurrentView($this->menu))
+		{
+			// Add Breadcrumbs
+			if($this->item->id > 1)
+			{
+				$path = [['title' => $this->item->title, 'link' => '']];
+			}
+			else
+			{
+				$path = [];
+			}
+			
+			$category = $this->item->parent;
+			
+			while($category && $category->id !== 1 && $category->id != $id)
+			{
+				$path[]   = ['title' => $category->title, 'link' => JoomHelper::getViewRoute('category', $category->id, 0, $category->language)];
+				$category = $this->getModel()->getParent($category->parent_id);
+			}
 
-    if(!\in_array($breadcrumbTitle, $pathway->getPathwayNames()))
-    {
-      $pathway->addItem($breadcrumbTitle);
-    }
+			$path = \array_reverse($path);
+
+			foreach($path as $item)
+			{
+				$this->app->getPathway()->addItem($item['title'], $item['link']);
+			}
+		}
 	}
 }

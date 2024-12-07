@@ -1,5 +1,4 @@
 <?php
-
 /**
 ******************************************************************************************
 **   @version    4.0.0-dev                                                                  **
@@ -20,7 +19,7 @@ use \Joomgallery\Component\Joomgallery\Administrator\Helper\JoomHelper;
 use \Joomgallery\Component\Joomgallery\Administrator\View\JoomGalleryView;
 
 /**
- * View class for a image view of Joomgallery.
+ * View class for a detail view of Joomgallery.
  * 
  * @package JoomGallery
  * @since   4.0.0
@@ -28,7 +27,7 @@ use \Joomgallery\Component\Joomgallery\Administrator\View\JoomGalleryView;
 class HtmlView extends JoomGalleryView
 {
 	/**
-	 * The image object
+	 * The media object
 	 *
 	 * @var  \stdClass
 	 */
@@ -133,20 +132,23 @@ class HtmlView extends JoomGalleryView
 			$this->document->setMetadata('robots', $this->params['menu']->get('robots'));
 		}
 
-    // Add Breadcrumbs
-    $pathway = $this->app->getPathway();
-    $breadcrumbList = Text::_('COM_JOOMGALLERY_IMAGES');
-
-    if(!\in_array($breadcrumbList, $pathway->getPathwayNames()))
-    {
-      $pathway->addItem($breadcrumbList, "index.php?option=com_joomgallery&view=images");
-    }
-
-    $breadcrumbTitle = Text::_('COM_JOOMGALLERY_IMAGES');
-
-    if(!\in_array($breadcrumbTitle, $pathway->getPathwayNames()))
-    {
-      $pathway->addItem($breadcrumbTitle);
-    }
+		if(!$this->isMenuCurrentView($menu))
+		{
+			// Add Breadcrumbs
+			$pathway = $this->app->getPathway();
+			$breadcrumbList = Text::_('COM_JOOMGALLERY_IMAGES');
+	
+			if(!\in_array($breadcrumbList, $pathway->getPathwayNames()))
+			{
+				$pathway->addItem($breadcrumbList, 'index.php?option=com_joomgallery&view=images');
+			}
+	
+			$breadcrumbTitle = $this->item->title;
+	
+			if(!\in_array($breadcrumbTitle, $pathway->getPathwayNames()))
+			{
+				$pathway->addItem($breadcrumbTitle, '');
+			}
+		}
 	}
 }

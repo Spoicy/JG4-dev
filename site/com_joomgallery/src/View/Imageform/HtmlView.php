@@ -69,6 +69,13 @@ class HtmlView extends JoomGalleryView
 	 */
 	public function display($tpl = null)
 	{
+		$this->app->enqueueMessage(Text::_('COM_JOOMGALLERY_ERROR_NOT_YET_AVAILABLE'), 'warning');
+
+		if(!$this->app->input->get('preview', 0))
+		{
+			return;
+		}
+		
 		$this->state  = $this->get('State');
 		$this->params = $this->get('Params');
 		$this->item   = $this->get('Item');
@@ -151,20 +158,23 @@ class HtmlView extends JoomGalleryView
 			$this->document->setMetadata('robots', $this->params['menu']->get('robots'));
 		}
 
-    // Add Breadcrumbs
-    $pathway = $this->app->getPathway();
-    $breadcrumbList = Text::_('COM_JOOMGALLERY_IMAGES');
-
-    if(!\in_array($breadcrumbList, $pathway->getPathwayNames()))
-    {
-      $pathway->addItem($breadcrumbList, "index.php?option=com_joomgallery&view=images");
-    }
-
-    $breadcrumbTitle = isset($this->item->id) ? Text::_("JGLOBAL_EDIT") : Text::_("JGLOBAL_FIELD_ADD");
-
-    if(!\in_array($breadcrumbTitle, $pathway->getPathwayNames()))
-    {
-      $pathway->addItem($breadcrumbTitle);
-    }
+		if(!$this->isMenuCurrentView($menu))
+		{
+			// Add Breadcrumbs
+			$pathway = $this->app->getPathway();
+			$breadcrumbList = Text::_('COM_JOOMGALLERY_IMAGES');
+	
+			if(!\in_array($breadcrumbList, $pathway->getPathwayNames()))
+			{
+				$pathway->addItem($breadcrumbList, 'index.php?option=com_joomgallery&view=images');
+			}
+	
+			$breadcrumbTitle = isset($this->item->id) ? Text::_('JGLOBAL_EDIT') : Text::_('JGLOBAL_FIELD_ADD');
+	
+			if(!\in_array($breadcrumbTitle, $pathway->getPathwayNames()))
+			{
+				$pathway->addItem($breadcrumbTitle, '');
+			}
+		}
 	}
 }

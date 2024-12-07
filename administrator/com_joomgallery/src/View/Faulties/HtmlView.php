@@ -13,6 +13,7 @@ namespace Joomgallery\Component\Joomgallery\Administrator\View\Faulties;
 // No direct access
 defined('_JEXEC') or die;
 
+use \Joomla\CMS\Log\Log;
 use \Joomla\CMS\Language\Text;
 use \Joomla\CMS\Toolbar\Toolbar;
 use \Joomla\CMS\Toolbar\ToolbarHelper;

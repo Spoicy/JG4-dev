@@ -14,6 +14,7 @@ namespace Joomgallery\Component\Joomgallery\Administrator\Service\IMGtools;
 \defined('_JEXEC') or die;
 
 use \Joomla\CMS\Factory;
+use \Joomla\CMS\Log\Log;
 use \Joomla\CMS\Filesystem\File;
 use \Joomla\CMS\Filesystem\Path;
 use \Joomla\CMS\Language\Text;
@@ -167,9 +168,9 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
    * Read image from file or image string (stream)
    * Supported image-types: depending on IM version
    *
-   * @param   string  $file        Path to source file or image string
-   * @param   bool    $is_stream   True if $src is image string (stream) (default: false)
-   * @param   bool    $base64      True if input string is base64 decoded (default: false)
+   * @param   string|resource  $file        Path to source file or image string or resource
+   * @param   bool             $is_stream   True if $src is image string (stream) (default: false)
+   * @param   bool             $base64      True if input string is base64 decoded (default: false)
    *
    * @return  bool    True on success, false otherwise
    *
@@ -243,6 +244,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
     if($this->analyse($file, $is_stream) == false)
     {
       $this->component->addDebug(Text::_('COM_JOOMGALLERY_ERROR_INVALID_IMAGEFILE'));
+      $this->component->addLog(Text::_('COM_JOOMGALLERY_ERROR_INVALID_IMAGEFILE'), 'error', 'jerror');
 
       return false;
     }
@@ -282,6 +284,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
     // Check image availability
     if(empty($this->res_imginfo['width']) || empty($this->res_imginfo['height']))
     {
+      $this->component->addLog(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'), 'error', 'jerror');
       throw new \Exception(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'));
     }
 
@@ -330,7 +333,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
     // assemble the shell command
     $convert = $this->assemble($file);
 
-    // strip [0] from src_file
+    /// Remove '[0]' from src_file
     $this->src_file = \str_replace('[0]','',$this->src_file);
 
     $return_var = null;
@@ -389,6 +392,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
       if(!File::exists($wtm_files['dst_file']))
       {
         $this->component->addDebug(Text::_('COM_JOOMGALLERY_SERVICE_ERROR_WATERMARKING'));
+        $this->component->addLog(Text::_('COM_JOOMGALLERY_SERVICE_ERROR_WATERMARKING'), 'error', 'jerror');
 
         return false;
       }
@@ -416,7 +420,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
     $this->clearVariables();
 
     return true;
-  } 
+  }
 
   /**
    * Output the image as string (stream)
@@ -436,6 +440,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
     // Check image availability
     if(empty($this->res_imginfo['width']) || empty($this->res_imginfo['height']))
     {
+      $this->component->addLog(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'), 'error', 'jerror');
       throw new \Exception(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'));
     }
 
@@ -449,24 +454,65 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
       $this->dst_type = $this->src_type;
     }
 
-    // Define temporary image file to be created
-    $tmp_folder = $this->app->get('tmp_path');
-    $tmp_file   = $tmp_folder.'/tmp_img_'.$this->rndNumber.'.'.\strtolower($this->dst_type);
+    // Temporary remove '[0]' from src_file
+    $first_frame_only = false;
+    if(\strpos($this->src_file, '[0]') !== false)
+    {
+      $this->src_file = \str_replace('[0]','',$this->src_file);
+      $first_frame_only = true;
+    }    
 
-    if(!$this->write($tmp_file, $quality))
+    // Define temporary image file to be created
+    $tmp_folder   = $this->app->get('tmp_path');
+    $tmp_dst_file = $tmp_folder.'/tmp_dst_img_'.$this->rndNumber.'.'.\strtolower($this->dst_type);
+
+    // Create temporary source file from stream
+    $tmp_src_file = $tmp_folder.'/tmp_src_img_'.$this->rndNumber.'.'.\strtolower($this->src_type);    
+    if(\is_resource($this->src_file))
+    {
+      // We are dealing with a streamed resource
+      \rewind($this->src_file);
+    }
+    if(\is_string($this->src_file) && \file_exists($this->src_file))
+    {
+      // We are dealing with a file path - copy it.
+      File::copy($this->src_file, $tmp_src_file);
+    }
+    else
+    {
+      // We are dealing with a file content in a string - write it.
+      \file_put_contents($tmp_src_file, $this->src_file);
+    }
+    
+    // Redefine scr_file variable
+    $this->src_file = $tmp_src_file;
+
+    // Select only first frame if to not keep animation
+    if($first_frame_only)
+    {
+      // If resizing an animation but not preserving the animation, consider only first frame
+      $this->onlyFirstFrame();
+    }
+
+    if(!$this->write($tmp_dst_file, $quality))
     {
       $this->component->addDebug(Text::_('COM_JOOMGALLERY_SERVICE_ERROR_OUTPUT_IMAGE'));
-      $this->rollback('', $tmp_file);
+      $this->component->addLog(Text::_('COM_JOOMGALLERY_SERVICE_ERROR_OUTPUT_IMAGE'), 'error', 'jerror');
+      $this->rollback($tmp_src_file, $tmp_dst_file);
 
       return false;
     }
 
-    $stream = \file_get_contents($tmp_file);
+    $stream = \file_get_contents($tmp_dst_file);
 
-    // Delete temporary image file
-    if(File::exists($tmp_file))
+    // Delete temporary image files
+    if(\file_exists($tmp_dst_file))
     {
-      File::delete($tmp_file);
+      File::delete($tmp_dst_file);
+    }
+    if(\file_exists($tmp_src_file))
+    {
+      File::delete($tmp_src_file);
     }
 
     if(!$base64)
@@ -533,6 +579,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
     // Check image availability
     if(empty($this->res_imginfo['width']) || empty($this->res_imginfo['height']))
     {
+      $this->component->addLog(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'), 'error', 'jerror');
       throw new \Exception(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'));
     }
 
@@ -575,6 +622,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
     if(!($this->getResizeInfo($this->src_type, $method, $width, $height, $cropposition)))
     {
       $this->component->addDebug(Text::_('COM_JOOMGALLERY_ERROR_INVALID_IMAGEFILE'));
+      $this->component->addLog(Text::_('COM_JOOMGALLERY_ERROR_INVALID_IMAGEFILE'), 'error', 'jerror');
 
       return false;
     }
@@ -659,6 +707,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
     // Check image availability
     if(empty($this->res_imginfo['width']) || empty($this->res_imginfo['height']))
     {
+      $this->component->addLog(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'), 'error', 'jerror');
       throw new \Exception(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'));
     }
 
@@ -838,10 +887,16 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
     // Check image availability
     if(empty($this->res_imginfo['width']) || empty($this->res_imginfo['height']))
     {
+      $this->component->addLog(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'), 'error', 'jerror');
       throw new \Exception(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'));
     }
 
     $this->auto_orient = true;
+
+    if(isset($this->metadata['exif']['IFD0']['Orientation']))
+    {
+      $this->autoOrient($this->metadata['exif']['IFD0']['Orientation']);
+    }
 
     return true;
   }
@@ -867,6 +922,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
     // Check image availability
     if(empty($this->res_imginfo['width']) || empty($this->res_imginfo['height']))
     {
+      $this->component->addLog(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'), 'error', 'jerror');
       throw new \Exception(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'));
     }
     
@@ -883,6 +939,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
     if(!File::exists($wtm_file))
     {
       $this->component->addDebug(Text::_('COM_JOOMGALLERY_SERVICE_ERROR_WATERMARK_NOT_EXIST'));
+      $this->component->addLog(Text::_('COM_JOOMGALLERY_SERVICE_ERROR_WATERMARK_NOT_EXIST'), 'error', 'jerror');
 
       return false;
     }
@@ -893,6 +950,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
     if(!($this->src_imginfo = $this->analyse($wtm_file)))
     {
       $this->component->addDebug(Text::_('COM_JOOMGALLERY_ERROR_INVALID_WTMFILE'));
+      $this->component->addLog(Text::_('COM_JOOMGALLERY_ERROR_INVALID_WTMFILE'), 'error', 'jerror');
 
       return false;
     }
@@ -1110,6 +1168,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
     // Check image availability
     if(empty($this->res_imginfo['width']) || empty($this->res_imginfo['height']))
     {
+      $this->component->addLog(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'), 'error', 'jerror');
       throw new \Exception(Text::_('COM_JOOMGALLERY_SERVICE_WORKSPACE_MISSING'));
     }
 
@@ -1208,6 +1267,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
       if($return_var != 0 || !$filecheck)
       {
         $this->component->addDebug(Text::sprintf('COM_JOOMGALLERY_SERVICE_SERVERPROBLEM_EXEC','exec('.$convert.');'));
+        $this->component->addLog(Text::sprintf('COM_JOOMGALLERY_SERVICE_SERVERPROBLEM_EXEC','exec('.$convert.');'), 'error', 'jerror');
         $this->rollback($this->src_file, $dst_file);
 
         return false;
@@ -1280,6 +1340,7 @@ class IMtools extends BaseIMGtools implements IMGtoolsInterface
       if($return_var != 0 || !$filecheck)
       {
         $this->component->addDebug(Text::sprintf('COM_JOOMGALLERY_SERVICE_SERVERPROBLEM_EXEC','exec('.$convert.');'));
+        $this->component->addLog(Text::sprintf('COM_JOOMGALLERY_SERVICE_SERVERPROBLEM_EXEC','exec('.$convert.');'), 'error', 'jerror');
         $this->rollback($this->src_file, $tmp_file);
 
         return false;

@@ -170,16 +170,10 @@ $tmpl    = $isModal || $app->input->get('tmpl', '', 'cmd') === 'component' ? '&t
             <div class="controls"><?php echo $this->form->getInput('imgmetadata'); ?></div>
           </div>
         </fieldset>
-      </div>
-    </div>
+		  </div>
+	  </div>
     <?php echo HTMLHelper::_('uitab.endTab'); ?>
-
-    <?php if ($this->getAcl()->checkACL('core.admin', 'joomgallery')) : ?>
-      <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'permissions', Text::_('JGLOBAL_ACTION_PERMISSIONS_LABEL', true)); ?>
-      <?php echo $this->form->getInput('rules'); ?>
-      <?php echo HTMLHelper::_('uitab.endTab'); ?>
-    <?php endif; ?>
-    <?php echo HTMLHelper::_('uitab.endTabSet'); ?>
+	  <?php echo HTMLHelper::_('uitab.endTabSet'); ?>
 
     <input type="hidden" name="task" value="" />
     <input type="hidden" name="jform[uploader]" value="html" />

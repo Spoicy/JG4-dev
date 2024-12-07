@@ -14,7 +14,6 @@ namespace Joomgallery\Component\Joomgallery\Administrator\Model;
 defined('_JEXEC') or die;
 
 use \Joomla\CMS\Factory;
-use \Joomla\CMS\Log\Log;
 use \Joomla\CMS\Form\Form;
 use \Joomla\CMS\Language\Text;
 use \Joomla\Utilities\ArrayHelper;
@@ -407,7 +406,7 @@ class ImageModel extends JoomAdminModel
 				// Check if the state was changed
 				if($table->published != $data['published'])
 				{
-					if(!$this->getAcl()->checkACL('core.edit.state', _JOOM_OPTION.'.image.'.$table->id))
+					if(!$this->getAcl()->checkACL('core.edit.state', _JOOM_OPTION.'.image.'.$table->id, $table->id, $table->catid))
 					{
 						// We are not allowed to change the published state
 						$this->component->addWarning(Text::_('JLIB_APPLICATION_ERROR_EDITSTATE_NOT_PERMITTED'));
@@ -787,7 +786,7 @@ class ImageModel extends JoomAdminModel
 					}
 					else
 					{
-						$this->component->addLog(Text::_('JLIB_APPLICATION_ERROR_DELETE_NOT_PERMITTED'), 'warning', 'jerror');
+						$this->component->addLog(Text::_('JLIB_APPLICATION_ERROR_DELETE_NOT_PERMITTED') . '; Image ID: ' . $pk, 'warning', 'jerror');
 
 						return false;
 					}

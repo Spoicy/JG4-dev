@@ -14,6 +14,7 @@ namespace Joomgallery\Component\Joomgallery\Administrator\Model;
 defined('_JEXEC') or die;
 
 use \Joomla\CMS\Factory;
+use \Joomla\CMS\Log\Log;
 use \Joomla\CMS\Form\Form;
 use \Joomla\CMS\Language\Text;
 use \Joomla\CMS\Filesystem\File;
@@ -280,6 +281,7 @@ class ConfigModel extends JoomAdminModel
 		// Access checks.
 		if(!$this->user->authorise('core.create', _JOOM_OPTION))
 		{
+			$this->component->addLog(Text::_('JERROR_CORE_CREATE_NOT_PERMITTED'), 'error', 'jerror');
 			throw new \Exception(Text::_('JERROR_CORE_CREATE_NOT_PERMITTED'));
 		}
 
@@ -299,6 +301,7 @@ class ConfigModel extends JoomAdminModel
 
         if(!$table->check())
         {
+          $this->component->addLog($table->getError(), 'error', 'jerror');
           throw new \Exception($table->getError());
         }        
 
@@ -307,6 +310,7 @@ class ConfigModel extends JoomAdminModel
 
         if(in_array(false, $result, true) || !$table->store())
         {
+          $this->component->addLog($table->getError(), 'error', 'jerror');
           throw new \Exception($table->getError());
         }
 
@@ -315,6 +319,7 @@ class ConfigModel extends JoomAdminModel
       }
       else
       {
+        $this->component->addLog($table->getError(), 'error', 'jerror');
         throw new \Exception($table->getError());
       }			
 		}
@@ -411,6 +416,7 @@ class ConfigModel extends JoomAdminModel
       {
         // not allowed to delete this imagetype
         $this->setError(Text::_('COM_JOOMGALLERY_ERROR_NOT_ALLOWED_DELETE_IMAGETYPE'));
+        $this->component->addLog(Text::_('COM_JOOMGALLERY_ERROR_NOT_ALLOWED_DELETE_IMAGETYPE'), 'error', 'jerror');
         //$this->app->enqueueMessage(Text::_('COM_JOOMGALLERY_ERROR_NOT_ALLOWED_DELETE_IMAGETYPE'));
       }
       else
@@ -450,6 +456,7 @@ class ConfigModel extends JoomAdminModel
 
       // It is not allowed to unpublish the global configuration set
       $this->app->enqueueMessage(Text::_('COM_JOOMGALLERY_ERROR_NOT_ALLOWED_UNPUBLISH_CONFIG_SET'));
+      $this->component->addLog(Text::_('COM_JOOMGALLERY_ERROR_NOT_ALLOWED_UNPUBLISH_CONFIG_SET'), 'error', 'jerror');
     }
 
     parent::publish($pks, $value);
@@ -472,8 +479,8 @@ class ConfigModel extends JoomAdminModel
     $obj['jg_imgtypename']        = '';
     $obj['jg_imgtypepath']        = '';
     $obj['jg_imgtyperesize']      = '0';
-    $obj['jg_imgtypewidth']       = '';
-    $obj['jg_imgtypeheight']      = '';
+    $obj['jg_imgtypewidth']       = '2000';
+    $obj['jg_imgtypeheight']      = '2000';
     $obj['jg_cropposition']       = '2';
     $obj['jg_imgtypeorinet']      = '1';
     $obj['jg_imgtypeanim']        = '0';
@@ -507,7 +514,7 @@ class ConfigModel extends JoomAdminModel
         break;
       
       default:
-        $params = '{"jg_imgtype":"1","jg_imgtyperesize":"0","jg_imgtypewidth":"","jg_imgtypeheight":"","jg_cropposition":"2","jg_imgtypeorinet":"0","jg_imgtypeanim":"1","jg_imgtypesharpen":"0","jg_imgtypequality":"100","jg_imgtypewatermark":"0","jg_imgtypewtmsettings":"{}"}';
+        $params = '{"jg_imgtype":"1","jg_imgtyperesize":"0","jg_imgtypewidth":"2000","jg_imgtypeheight":"2000","jg_cropposition":"2","jg_imgtypeorinet":"0","jg_imgtypeanim":"1","jg_imgtypesharpen":"0","jg_imgtypequality":"100","jg_imgtypewatermark":"0","jg_imgtypewtmsettings":"{}"}';
         break;
     }
   }
@@ -639,10 +646,13 @@ class ConfigModel extends JoomAdminModel
 		{
 			if(strpos($key, 'jg_') !== false)
 			{
-				if($key == 'jg_replaceinfo' || $key == 'jg_dynamicprocessing')
+				if($key == 'jg_replaceinfo')
 				{
-					// set default by hand
-					$default = array();
+					$default = '{"jg_replaceinfo0":{"target":"date","source":"EXIF-36867"}}';
+				}
+				else if($key == 'jg_dynamicprocessing')
+				{
+					$default = '{"jg_dynamicprocessing0":{"jg_imgtype":"0","jg_imgtypename":"original","jg_imgtyperesize":"0","jg_imgtypewidth":"2000","jg_imgtypeheight":"2000","jg_cropposition":"2","jg_imgtypeorinet":"0","jg_imgtypeanim":"1","jg_imgtypesharpen":"0","jg_imgtypequality":100,"jg_imgtypewatermark":"0","jg_imgtypewtmsettings":{"jg_watermarkpos":"9","jg_watermarkzoom":"0","jg_watermarksize":15,"jg_watermarkopacity":80}},"jg_dynamicprocessing1":{"jg_imgtype":"0","jg_imgtypename":"detail","jg_imgtyperesize":"0","jg_imgtypewidth":"1000","jg_imgtypeheight":"1000","jg_cropposition":"2","jg_imgtypeorinet":"0","jg_imgtypeanim":"0","jg_imgtypesharpen":"0","jg_imgtypequality":80,"jg_imgtypewatermark":"0","jg_imgtypewtmsettings":{"jg_watermarkpos":"9","jg_watermarkzoom":"0","jg_watermarksize":15,"jg_watermarkopacity":80}},"jg_dynamicprocessing2":{"jg_imgtype":"0","jg_imgtypename":"thumbnail","jg_imgtyperesize":"0","jg_imgtypewidth":"360","jg_imgtypeheight":"360","jg_cropposition":"2","jg_imgtypeorinet":"0","jg_imgtypeanim":"0","jg_imgtypesharpen":"0","jg_imgtypequality":60,"jg_imgtypewatermark":"0","jg_imgtypewtmsettings":{"jg_watermarkpos":"9","jg_watermarkzoom":"0","jg_watermarksize":15,"jg_watermarkopacity":80}}}';
 				}
 				else if($key == 'jg_staticprocessing')
 				{
@@ -675,6 +685,7 @@ class ConfigModel extends JoomAdminModel
 
 										if($default_wtm === 'not found')
 										{
+											$this->component->addLog('Watermark subform field with name '.$wtm_key.' does not have any default value!', 'error', 'jerror');
 											throw new \Exception('Watermark subform field with name '.$wtm_key.' does not have any default value!', 1);
 										}
 
@@ -689,6 +700,7 @@ class ConfigModel extends JoomAdminModel
 									
 									if($default === 'not found')
 									{
+										$this->component->addLog('Convert subform field with name '.$key.' does not have any reset value!', 'error', 'jerror');
 										throw new \Exception('Convert subform field with name '.$key.' does not have any reset value!', 1);
 									}
 
@@ -717,6 +729,7 @@ class ConfigModel extends JoomAdminModel
 
 				if($default === 'not found')
 				{
+					$this->component->addLog('Config field with name '.$key.' does not have any default value!', 'error', 'jerror');
 					throw new \Exception('Config field with name '.$key.' does not have any default value!', 1);
 				}
 
@@ -767,6 +780,7 @@ class ConfigModel extends JoomAdminModel
 		{
 			// Upload failed
 			$this->setError(Text::_('COM_JOOMGALLERY_ERROR_HTML_MAXFILESIZE'), 'error');
+			$this->component->addLog(Text::_('COM_JOOMGALLERY_ERROR_HTML_MAXFILESIZE'), 'error', 'jerror');
 
 			return false;
 		}
@@ -776,6 +790,7 @@ class ConfigModel extends JoomAdminModel
 		{
 			// Invalid file extension
 			$this->setError(Text::sprintf('COM_JOOMGALLERY_ERROR_INVALID_FILE_EXTENSION', 'json', $file['name']), 'error');
+			$this->component->addLog(Text::sprintf('COM_JOOMGALLERY_ERROR_INVALID_FILE_EXTENSION', 'json', $file['name']), 'error', 'jerror');
 
 			return false;
 		}
@@ -790,6 +805,7 @@ class ConfigModel extends JoomAdminModel
 		{
 			// JSON not valid
 			$this->setError(Text::sprintf('COM_JOOMGALLERY_ERROR_INVALID_FILE_CONTENT', $file['name']), 'error');
+			$this->component->addLog(Text::sprintf('COM_JOOMGALLERY_ERROR_INVALID_FILE_CONTENT', $file['name']), 'error', 'jerror');
 
 			return false;
 		}

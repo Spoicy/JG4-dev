@@ -274,6 +274,17 @@
              label="COM_JOOMGALLERY_CONFIG_IP_STATIC" 
              description="COM_JOOMGALLERY_CONFIG_IP_STATIC_DESC" />
 
+      <field name="jg_dynamic_watermark"
+             type="radio"
+             default="1"
+             class="btn-group"
+             layout="joomla.form.field.radio.switcher"
+             label="COM_JOOMGALLERY_CONFIG_DYNAMIC_WATERMARK"
+             description="COM_JOOMGALLERY_CONFIG_DYNAMIC_WATERMARK_LONG">
+        <option value="0">JNO</option>
+        <option value="1">JYES</option>
+      </field>
+
       <field name="jg_dynamicprocessing"
              type="subform"
              min="0"
@@ -435,7 +446,7 @@
         <field name="jg_userspace"
               type="radio"
               default="1"
-              class="btn-group unused"
+              class="btn-group"
               layout="joomla.form.field.radio.switcher"
               label="COM_JOOMGALLERY_CONFIG_USERSPACE"
               description="COM_JOOMGALLERY_CONFIG_USERSPACE_LONG" >
@@ -748,7 +759,6 @@
         <field
             name="jg_category_view_numb_subcategories"
             type="number"
-            class="unused"
             default="12"
             min="1"
             max="999"
@@ -760,20 +770,18 @@
         <field
             name="jg_category_view_subcategories_pagination"
             type="list"
-            class="unused"
             label="COM_JOOMGALLERY_CONFIG_CATEGORY_SUBCATEGORIES_PAGINATION"
             description="COM_JOOMGALLERY_CONFIG_CATEGORY_SUBCATEGORIES_PAGINATION_DESC"
-            default="pagination"
+            default="0"
             validate="options"
             >
-            <option value="pagination">COM_JOOMGALLERY_CONFIG_CATEGORY_VIEW_PAGINATION</option>
-            <option value="loadmore">COM_JOOMGALLERY_CONFIG_CATEGORY_VIEW_LOADMORE</option>
-            <option value="infinity">COM_JOOMGALLERY_CONFIG_CATEGORY_VIEW_INFINITY</option>
+            <option value="0">COM_JOOMGALLERY_CONFIG_CATEGORY_VIEW_PAGINATION</option>
+            <option value="1">COM_JOOMGALLERY_CONFIG_CATEGORY_VIEW_LOADMORE</option>
+            <option value="2">COM_JOOMGALLERY_CONFIG_CATEGORY_VIEW_INFINITY</option>
         </field>
         <field
             name="jg_category_view_subcategories_random_image"
             type="radio"
-            class="unused"
             label="COM_JOOMGALLERY_CONFIG_CATEGORY_SUBCATEGORIES_RANDOM_IMAGES"
             description="COM_JOOMGALLERY_CONFIG_CATEGORY_SUBCATEGORIES_RANDOM_IMAGES_DESC"
             default="1"
@@ -783,7 +791,19 @@
             <option value="0">JNO</option>
             <option value="1">JYES</option>
         </field>
-
+        <field
+            name="jg_category_view_subcategories_random_subimages"
+            type="radio"
+            label="COM_JOOMGALLERY_CONFIG_CATEGORY_SUBCATEGORIES_RANDOM_SUBIMAGES"
+            description="COM_JOOMGALLERY_CONFIG_CATEGORY_SUBCATEGORIES_RANDOM_SUBIMAGES_DESC"
+            default="0"
+            layout="joomla.form.field.radio.switcher"
+            validate="options"
+            showon="jg_category_view_subcategories_random_image:1"
+            >
+            <option value="0">JNO</option>
+            <option value="1">JYES</option>
+        </field>
         <field
             label="COM_JOOMGALLERY_CONFIG_CATEGORY_VIEW_IMAGES"
             type="spacer"
@@ -857,8 +877,7 @@
         <field
             name="jg_category_view_numb_images"
             type="number"
-            class="unused"
-            default="16"
+            default="12"
             min="1"
             max="9999"
             step="1"
