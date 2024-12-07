@@ -1124,6 +1124,44 @@ class ImageModel extends JoomAdminModel
   }
 
   /**
+   * Method to save metadata to an image file
+   *
+   * @param   int     $pk    The record primary key.
+   * @param   string  $type  The imagetype to which file the metadata gets stored to.
+   *
+   * @return  boolean  True if successful, false if an error occurs.
+   *
+   * @since   4.0
+   */
+  public function savemetadata(int $pk, $type='original'): bool
+  {
+    $table = $this->getTable();
+
+    if($table->load($pk))
+    {
+      // Create config service
+      $this->component->createConfig();
+
+      // Create the metadata service
+      $this->component->createMetadata($this->component->getConfig()->get('jg_metaprocessor', 'php'));
+
+      // Perfrom the save using the metadata service
+      $this->component->getMetadata()->writeMetadata("", $array);
+    }
+    else
+    {
+      $this->setError($table->getError());
+
+      return false;
+    }
+
+    // Clear the component's cache
+    $this->cleanCache();
+
+    return true;
+  }
+
+  /**
    * Method to test whether a record can be recreated.
    *
    * @param   object  $record  A record object.

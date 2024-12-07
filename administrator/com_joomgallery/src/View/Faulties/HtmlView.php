@@ -21,6 +21,7 @@ use \Joomla\CMS\HTML\Helpers\Sidebar;
 use \Joomla\Component\Content\Administrator\Extension\ContentComponent;
 use \Joomgallery\Component\Joomgallery\Administrator\Helper\JoomHelper;
 use \Joomgallery\Component\Joomgallery\Administrator\View\JoomGalleryView;
+use \lsolesen\pel\PelTag;
 
 /**
  * View class for a list of Faulties.
@@ -47,10 +48,40 @@ class HtmlView extends JoomGalleryView
 	{
     $this->app->enqueueMessage(Text::_('COM_JOOMGALLERY_ERROR_NOT_YET_AVAILABLE'), 'warning');
 
-		if(!$this->app->input->get('preview', 0))
-		{
-			return;
-		}
+    // Create config Service
+    $this->component->createConfig();
+    $processor = $this->component->getConfig()->get('jg_metaprocessor', 'php');
+
+		// Development code for Metadata Service
+		$this->component->createMetadata($processor);
+
+		echo $this->component->getMetadata()->copyMetadata(__DIR__ . '/Nikon_COOLPIX_P1.jpg', __DIR__ . '/Ricoh_Caplio_RR330.jpg', "JPG", "JPG", false, false);
+
+		// $arrayExif = array();
+		// $arrayExif[PelTag::MAKE] = "Nikon10";
+		// $arrayIptc = array();
+		// $arrayIptc["2#090"] = "Bern";
+		// $arrayIptc["2#095"] = "Switzerland";
+		// echo $this->component->getMetadata()->saveExifEdit(__DIR__ . '/Nikon_COOLPIX_P1.jpg', $arrayExif);
+
+		// echo $this->component->getMetadata()->saveIptcEdit(__DIR__ . '/Nikon_COOLPIX_P1.jpg', $arrayIptc);
+		
+		//var_dump($this->component->getMetadata()->readJpegMetadata(__DIR__ . '/Nikon_COOLPIX_P1.jpg'));
+
+		// echo $this->component->getMetadata()->copyExifData(__DIR__ . '/Ricoh_Caplio_RR330.jpg', __DIR__ . '/Nikon_COOLPIX_P1.jpg');
+		// echo $this->component->getMetadata()->readJpegMetadata(__DIR__ . '/Ricoh_Caplio_RR330.jpg');
+		// echo $this->component->getMetadata()->readJpegMetadata(__DIR__ . '/Nikon_COOLPIX_P1.jpg');
+
+		/*$array[PelTag::IMAGE_DESCRIPTION] = "Testing";
+		$array[PelTag::ORIENTATION] = 1;
+		$array[PelTag::FNUMBER] = [287, 100];
+		$array[PelTag::COPYRIGHT] = ['graph', 'editor'];
+		$array[PelTag::SUBJECT_DISTANCE] = [2, 1];
+		$array[PelTag::USER_COMMENT] = "This is a user comment.";*/
+		//echo $this->component->getMetadata()->saveExifEdit("", $array);
+		
+
+    return;
 
     $this->state         = $this->get('State');
     $this->items         = $this->get('Items');
