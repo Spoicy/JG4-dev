@@ -27,11 +27,13 @@ class Metadata implements MetadataInterface
 {
   use ServiceTrait;
 
-  public function readMetadata(string $file) {
+  public function readMetadata(string $file)
+  {
     return false;
   }
 
-  public function copyMetadata($src_file, $dst_file, $src_imagetype, $dst_imgtype, $new_orient, $bak) {
+  public function copyMetadata($src_file, $dst_file, $src_imagetype, $dst_imgtype, $new_orient, $bak)
+  {
     return false;
   }
 
@@ -50,7 +52,8 @@ class Metadata implements MetadataInterface
    * 
    * @since   4.0.0
    */
-  public function writeToExif(string $img, $edits): bool {
+  public function writeToExif(string $img, $edits): bool
+  {
     return false;
   }
 
@@ -64,23 +67,8 @@ class Metadata implements MetadataInterface
    * 
    * @since   4.0.0
    */
-  public function writeToIptc(string $img, array $edits): bool {
-    return false;
-  }
-
-  /**
-   * Saves an edit to the xmp metadata of an image
-   * 
-   * Currently unimplemented
-   * 
-   * @param   string $img   Path to the image 
-   * @param   array $edits  Array of edits to be made to the metadata
-   * 
-   * @return  bool          True on success, false on failure
-   * 
-   * @since   4.0.0
-   */
-  public function saveXmpEdit(string $img, array $edits): bool {
+  public function writeToIptc(string $img, array $edits): bool
+  {
     return false;
   }
 }

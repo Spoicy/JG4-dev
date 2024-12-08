@@ -103,6 +103,20 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     $this->getApp();
   }
 
+  public function writeMetadata($img, $imgmetadata): mixed
+  {
+    $file = file_get_contents($img);
+    $tmpFolder = $this->app->get('tmp_path');
+    $tmpPath = $tmpFolder . '/' . basename($img);
+
+    file_put_contents($tmpPath, $file);
+
+    $exifSuccess = self::writeToExif($tmpPath, $imgmetadata->get('exif'));
+    $iptcSuccess = self::writeToIptc($tmpPath, $imgmetadata->get('iptc'));
+
+    return file_get_contents($tmpPath);
+  }
+
   /**
    * Writes a list of values to the exif metadata of an image
    * 
@@ -164,54 +178,38 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     return true;
   }
 
-  public function writeMetadata($img, $imgmetadata): mixed
-  {
-    $file = file_get_contents($img);
-    $tmpFolder = $this->app->get('tmp_path');
-    $tmpPath = $tmpFolder.'/'.basename($img);
-
-    file_put_contents($tmpPath, $file);
-
-    $exifSuccess = self::writeToExif($tmpPath, $imgmetadata->get('exif'));
-    $iptcSuccess = self::writeToIptc($tmpPath, $imgmetadata->get('iptc'));
-
-    return file_get_contents($tmpPath);
-  }
-
   /**
-   * Gets the jpeg/tiff objects from a valid JPEG or TIFF image with PEL.
+   * Writes a list of values to the iptc metadata of an image
    * 
-   * @param  string $img    The image data
+   * @param   string $img   Path to the image 
+   * @param   array  $edits Array of edits to be made to the metadata
    * 
-   * @return array|false    File and tiff objects on success, false on failure.
+   * @return  bool          True on success, false on failure
    * 
-   * @since 4.0.0
+   * @since   4.0.0
    */
-  private function getPelImageObjects(string $img)
+  public function writeToIptc(string $img, array $edits): bool
   {
-    $file = file_get_contents($img);
-    $data = new PelDataWindow($file);
-    if (PelJpeg::isValid($data)) {
-      $jpeg = $file = new PelJpeg();
-      $jpeg->load($data);
-      $exifdata = $jpeg->getExif();
-      // Check if APP1 section exists, create if not along with tiff
-      if ($exifdata == null) {
-        $exifdata = new PelExif();
-        $jpeg->setExif($exifdata);
-        $tiff = new PelTiff();
-        $exifdata->setTiff($tiff);
-      }
-      $tiff = $exifdata->getTiff();
-    } elseif (PelTiff::isValid($data)) {
-      // Data was recognized as TIFF. PelTiff/Ifd is what is being edited regardless.
-      $tiff = $file = new PelTiff();
-      $tiff->load($data);
-    } else {
-      // Handle invalid data
-      return false;
+    if (count($edits) <= 0) {
+      return true;
     }
-    return ["file" => $file, "tiff" => $tiff];
+
+    $editor = new IptcDataEditor();
+    $tagString = "";
+    foreach ($edits as $tag => $edit) {
+      if ($edit != "") {
+        $result = $editor->createEdit($tag, $edit);
+        if ($result != false) {
+          $tagString .= $result;
+        }
+      }
+    }
+
+    $content = iptcembed($tagString, $img);
+    $fp = fopen($img, "wb");
+    fwrite($fp, $content);
+    fclose($fp);
+    return true;
   }
 
   /**
@@ -272,6 +270,42 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
       }
     }
     return $metadata;
+  }
+
+  /**
+   * Gets the jpeg/tiff objects from a valid JPEG or TIFF image with PEL.
+   * 
+   * @param  string $img    The image data
+   * 
+   * @return array|false    File and tiff objects on success, false on failure.
+   * 
+   * @since 4.0.0
+   */
+  private function getPelImageObjects(string $img)
+  {
+    $file = file_get_contents($img);
+    $data = new PelDataWindow($file);
+    if (PelJpeg::isValid($data)) {
+      $jpeg = $file = new PelJpeg();
+      $jpeg->load($data);
+      $exifdata = $jpeg->getExif();
+      // Check if APP1 section exists, create if not along with tiff
+      if ($exifdata == null) {
+        $exifdata = new PelExif();
+        $jpeg->setExif($exifdata);
+        $tiff = new PelTiff();
+        $exifdata->setTiff($tiff);
+      }
+      $tiff = $exifdata->getTiff();
+    } elseif (PelTiff::isValid($data)) {
+      // Data was recognized as TIFF. PelTiff/Ifd is what is being edited regardless.
+      $tiff = $file = new PelTiff();
+      $tiff->load($data);
+    } else {
+      // Handle invalid data
+      return false;
+    }
+    return ["file" => $file, "tiff" => $tiff];
   }
   
   /**
@@ -526,54 +560,5 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
       // File doesn't exist
       return false;
     }
-  }
-
-  /**
-   * Writes a list of values to the iptc metadata of an image
-   * 
-   * @param   string $img   Path to the image 
-   * @param   array  $edits Array of edits to be made to the metadata
-   * 
-   * @return  bool          True on success, false on failure
-   * 
-   * @since   4.0.0
-   */
-  public function writeToIptc(string $img, array $edits): bool
-  {
-    if (count($edits) <= 0) {
-      return true;
-    }
-
-    $editor = new IptcDataEditor();
-    $tagString = "";
-    foreach ($edits as $tag => $edit) {
-      if ($edit != "") {
-        $tagString .= $editor->createEdit($tag, $edit);
-      }
-    }
-
-    $content = iptcembed($tagString, $img);
-    $fp = fopen($img, "wb");
-    fwrite($fp, $content);
-    fclose($fp);
-    return true;
-  }
-
-  /**
-   * Saves an edit to the xmp metadata of an image
-   * 
-   * Currently unimplemented
-   * 
-   * @param   string $img   Path to the image 
-   * @param   array  $edits Array of edits to be made to the metadata
-   * 
-   * @return  bool          True on success, false on failure
-   * 
-   * @since   4.0.0
-   */
-  public function saveXmpEdit(string $img, array $edits): bool
-  {
-    // This function is currently not implemented. Potentially out of scope for the WIPRO project.
-    return false;
   }
 }

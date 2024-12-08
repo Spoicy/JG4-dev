@@ -72,7 +72,7 @@
            label="COM_JOOMGALLERY_IPTC_DATECREATED"
            description="COM_JOOMGALLERY_IPTC_DATECREATED_DEFINITION" />
 
-    <field name="iptc_desc"
+    <field name="2#120"
            type="textarea"
            filter="string"
            rows="5"

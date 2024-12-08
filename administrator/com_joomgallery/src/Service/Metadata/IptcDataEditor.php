@@ -22,56 +22,40 @@ namespace Joomgallery\Component\Joomgallery\Administrator\Service\Metadata;
  */
 class IptcDataEditor
 {
-    /**
-     * @var array
-     */
-    protected $iptcHeaderArray = array(
-        '2#005' => 'DocumentTitle',
-        '2#010' => 'Urgency',
-        '2#015' => 'Category',
-        '2#020' => 'Subcategories',
-        '2#040' => 'SpecialInstructions',
-        '2#055' => 'CreationDate',
-        '2#080' => 'AuthorByline',
-        '2#085' => 'AuthorTitle',
-        '2#090' => 'City',
-        '2#095' => 'State',
-        '2#101' => 'Country',
-        '2#103' => 'OTR',
-        '2#105' => 'Headline',
-        '2#110' => 'Source',
-        '2#115' => 'PhotoSource',
-        '2#116' => 'Copyright',
-        '2#120' => 'Caption',
-        '2#122' => 'CaptionWriter'
-    );
-
+    
     /**
      * @var array
      */
     protected $iptcStringArray = array(
+        '2#003' => [3, 67],
         '2#005' => [0, 64],
+        '2#007' => [0, 64],
         '2#015' => [0, 3],
         '2#020' => [0, 32],
-        '2#040' => 'SpecialInstructions',
-        '2#080' => 'AuthorByline',
-        '2#085' => 'AuthorTitle',
-        '2#090' => 'City',
-        '2#095' => 'State',
-        '2#101' => 'Country',
-        '2#103' => 'OTR',
-        '2#105' => 'Headline',
-        '2#110' => 'Source',
-        '2#115' => 'PhotoSource',
-        '2#116' => 'Copyright',
-        '2#120' => 'Caption',
-        '2#122' => 'CaptionWriter'
+        '2#022' => [0, 32],
+        '2#025' => [0, 64],
+        '2#040' => [0, 256],
+        '2#080' => [0, 32],
+        '2#085' => [0, 32],
+        '2#090' => [0, 32],
+        '2#092' => [0, 32],
+        '2#095' => [0, 32],
+        '2#095' => [3, 3],
+        '2#101' => [0, 64],
+        '2#105' => [0, 256],
+        '2#110' => [0, 32],
+        '2#115' => [0, 32],
+        '2#116' => [0, 128],
+        '2#118' => [0, 128],
+        '2#120' => [0, 2000],
+        '2#122' => [0, 32]
     );
 
     /**
      * @var array
      */
     protected $iptcDigitsArray = array(
+        '2#008' => 2,
         '2#010' => 1,
         '2#055' => 8
     );
@@ -82,16 +66,19 @@ class IptcDataEditor
      * @param   string $tag  The record & dataset tags in a 0#000 format
      * @param   mixed  $data The data to be stored
      * 
-     * @return  string       Octet structure that complies to IPTC's specification
+     * @return  mixed       Octet structure that complies to IPTC's specification
      * 
      * @since   4.0.0
      */
-    public function createEdit(string $tag, mixed $data): string
+    public function createEdit(string $tag, mixed $data): mixed
     {
-        // TODO: Add data validation
-        $explode = explode("#", $tag);
-        $octetStruct = self::makeTag(intval($explode[0]), intval($explode[1]), $data);
-        return $octetStruct;
+        if ((isset($iptcStringArray) && $iptcStringArray[$tag][0] <= strlen($data) && strlen($data) <= $iptcStringArray[$tag][1]) ||
+            (isset($iptcDigitsArray) && $iptcDigitsArray[$tag] >= $data)) {
+            $explode = explode("#", $tag);
+            $octetStruct = self::makeTag(intval($explode[0]), intval($explode[1]), $data);
+            return $octetStruct;
+        }
+        return false;
     }
 
     /**
@@ -131,7 +118,17 @@ class IptcDataEditor
         return $retval . $value;
     }
 
-    public function convertIptcToString(array $app13): string {
+    /**
+     * Converts the APP13 section of a JPEG image to a string to be embedded.
+     * 
+     * @param  array $app13  APP13 section from the info return value of getimagesize()
+     * 
+     * @return string        APP13 as an iptcembed() compatible string
+     * 
+     * @since 4.0.0
+     */
+    public function convertIptcToString(array $app13): string
+    {
         $retval = "";
         foreach ($app13 as $tag => $value) {
             var_dump($value);

@@ -48,7 +48,9 @@ class PelDataEditor {
      * 
      * @since   4.0.0
      */
-    public function makeEdit(PelIfd $ifd, int $tag, mixed $data, int $format) {
+    public function makeEdit(PelIfd $ifd, int $tag, mixed $data, int $format)
+    {
+        // Datetime, Copyright and UserComment entries all have specific ways that they need to be handled.
         $entry = $ifd->getEntry($tag);
         if (in_array($tag, self::$timeTags)) {
             if ($entry == null) {

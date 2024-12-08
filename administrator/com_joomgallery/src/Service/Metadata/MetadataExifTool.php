@@ -58,21 +58,4 @@ class MetadataExifTool extends BaseMetadata implements MetadataInterface
     // Currently unimplemented, will be implemented.
     return false;
   }
-
-  /**
-   * Saves an edit to the xmp metadata of an image
-   * 
-   * @param   string $img   Path to the image 
-   * @param   array $edits  Array of edits to be made to the metadata
-   * 
-   * @return  bool          True on success, false on failure
-   * 
-   * @since   4.0.0
-   */
-  public function saveXmpEdit(string $img, array $edits): bool
-  {
-    // This function is currently not implemented. Potentially out of scope for the WIPRO project.
-    // Should be simple to implement with ExifTool.
-    return false;
-  }
 }

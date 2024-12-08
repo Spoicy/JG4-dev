@@ -74,18 +74,4 @@ interface MetadataInterface
    * @since   4.0.0
    */
   public function writeToIptc(string $img, array $edits): bool;
-
-  /**
-   * Saves an edit to the xmp metadata of an image
-   * 
-   * Currently unimplemented
-   * 
-   * @param   string $img   Path to the image 
-   * @param   array $edits  Array of edits to be made to the metadata
-   * 
-   * @return  bool          True on success, false on failure
-   * 
-   * @since   4.0.0
-   */
-  public function saveXmpEdit(string $img, array $edits): bool;
 }
