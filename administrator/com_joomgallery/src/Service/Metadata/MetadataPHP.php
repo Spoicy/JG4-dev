@@ -14,6 +14,7 @@ namespace Joomgallery\Component\Joomgallery\Administrator\Service\Metadata;
 \defined('_JEXEC') or die;
 
 use \Joomla\CMS\Factory;
+use \Joomla\Registry\Registry;
 use \Joomgallery\Component\Joomgallery\Administrator\Helper\JoomHelper;
 use \Joomgallery\Component\Joomgallery\Administrator\Extension\ServiceTrait;
 use \Joomgallery\Component\Joomgallery\Administrator\Service\Metadata\Metadata as BaseMetadata;
@@ -97,17 +98,22 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     PelTag::SCENE_TYPE => PelFormat::UNDEFINED
   ];
 
+  public function __construct() 
+  {
+    $this->getApp();
+  }
+
   /**
    * Writes a list of values to the exif metadata of an image
    * 
-   * @param   string $img   Path to the image 
-   * @param   array  $edits The "exif" portion of the imgmetadata array
+   * @param   string $img    Path to the image 
+   * @param   mixed  $edits  Exif object in imgmetadata
    * 
-   * @return  bool          True on success, false on failure
+   * @return  bool           True on success, false on failure
    * 
    * @since   4.0.0
    */
-  public function writeToExif(string $img, array $edits): bool
+  public function writeToExif(string $img, $edits): bool
   {
     $file = file_get_contents($img);
     $data = new PelDataWindow($file);
@@ -136,26 +142,40 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     $editor = new PelDataEditor();
 
     // Cycle through all the necessary edits and perform them
-    foreach ($edits['IFD0'] as $name => $edit) {
-      if (!isset(self::$entryTypes[PelTag::getExifTagByName($name)])) {
+    foreach ($edits->IFD0 as $name => $edit) {
+      if (!isset(self::$entryTypes[PelTag::getExifTagByName($name)]) || $edit == "") {
         // Address does not reference a listed tag.
         continue;
       }
       $tag = PelTag::getExifTagByName($name);
-      $editor->makeEdit($ifd0, $tag, $edit, self::$entryTypes[$tag]);
+      $editor->makeEdit($ifd0, $tag, self::formatForPelEntry($edit, self::$entryTypes[$tag]), self::$entryTypes[$tag]);
     }
-    foreach ($edits['EXIF'] as $name => $edit) {
-      if (!isset(self::$entryTypes[PelTag::getExifTagByName($name)])) {
+    foreach ($edits->EXIF as $name => $edit) {
+      if (!isset(self::$entryTypes[PelTag::getExifTagByName($name)]) || $edit == "") {
         // Address does not reference a listed tag.
         continue;
       }
       $tag = PelTag::getExifTagByName($name);
-      $editor->makeEdit($subIfd, $tag, $edit, self::$entryTypes[$tag]);
+      $editor->makeEdit($subIfd, $tag, self::formatForPelEntry($edit, self::$entryTypes[$tag]), self::$entryTypes[$tag]);
     }
 
     $exifdata->setTiff($tiff);
     $file->saveFile($img);
     return true;
+  }
+
+  public function writeMetadata($img, $imgmetadata): mixed
+  {
+    $file = file_get_contents($img);
+    $tmpFolder = $this->app->get('tmp_path');
+    $tmpPath = $tmpFolder.'/'.basename($img);
+
+    file_put_contents($tmpPath, $file);
+
+    $exifSuccess = self::writeToExif($tmpPath, $imgmetadata->get('exif'));
+    $iptcSuccess = self::writeToIptc($tmpPath, $imgmetadata->get('iptc'));
+
+    return file_get_contents($tmpPath);
   }
 
   /**
@@ -274,6 +294,16 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
       return $entry->getValue(PelEntryTime::EXIF_STRING);
     } else {
       return $entry->getValue();
+    }
+  }
+
+  private function formatForPelEntry($entry, $type)
+  {
+    if ($type == PelFormat::RATIONAL || $type == PelFormat::SRATIONAL) {
+      $explode = explode("/", $entry);
+      return [intval($explode[0]), intval($explode[1])];
+    } else {
+      return $entry;
     }
   }
 
@@ -517,7 +547,9 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     $editor = new IptcDataEditor();
     $tagString = "";
     foreach ($edits as $tag => $edit) {
-      $tagString .= $editor->createEdit($tag, $edit);
+      if ($edit != "") {
+        $tagString .= $editor->createEdit($tag, $edit);
+      }
     }
 
     $content = iptcembed($tagString, $img);

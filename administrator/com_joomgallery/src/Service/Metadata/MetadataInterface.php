@@ -45,31 +45,31 @@ interface MetadataInterface
    * Writes the stored metadata to the specified image
    * 
    * @param  string $file         Path to source file
-   * @param  array  $imgmetadata  Stored image metadata
+   * @param  mixed  $imgmetadata  Stored image metadata
    * 
-   * @return bool   true on success, false on failure
+   * @return mixed                Image data to be stored with Filemanager
    */
   public function writeMetadata($img, $imgmetadata);
 
   /**
    * Writes a list of values to the exif metadata of an image
    * 
-   * @param   string $img   Path to the image 
-   * @param   array $edits  Array of edits to be made to the metadata
+   * @param   string $img    Path to the image 
+   * @param   mixed  $edits  Exif object in imgmetadata
    * 
-   * @return  bool          True on success, false on failure
+   * @return  bool           True on success, false on failure
    * 
    * @since   4.0.0
    */
-  public function writeToExif(string $img, array $edits): bool;
+  public function writeToExif(string $img, $edits): bool;
 
   /**
    * Saves an edit to the iptc metadata of an image
    * 
-   * @param   string $img   Path to the image 
-   * @param   array $edits  Array of edits to be made to the metadata
+   * @param   string $img    Path to the image 
+   * @param   mixed  $edits  Iptc object in imgmetadata
    * 
-   * @return  bool          True on success, false on failure
+   * @return  bool           True on success, false on failure
    * 
    * @since   4.0.0
    */

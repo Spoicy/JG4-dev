@@ -35,7 +35,7 @@ class Metadata implements MetadataInterface
     return false;
   }
 
-  public function writeMetadata($img, $imgmetadata): bool
+  public function writeMetadata($img, $imgmetadata): mixed
   {
     return false;
   }
@@ -43,14 +43,14 @@ class Metadata implements MetadataInterface
   /**
    * Writes a list of values to the exif metadata of an image
    * 
-   * @param   string $img   Path to the image 
-   * @param   array $edits  Array of edits to be made to the metadata
+   * @param   string $img    Path to the image 
+   * @param   mixed  $edits  Exif object in imgmetadata
    * 
-   * @return  bool          True on success, false on failure
+   * @return  bool           True on success, false on failure
    * 
    * @since   4.0.0
    */
-  public function writeToExif(string $img, array $edits): bool {
+  public function writeToExif(string $img, $edits): bool {
     return false;
   }
 

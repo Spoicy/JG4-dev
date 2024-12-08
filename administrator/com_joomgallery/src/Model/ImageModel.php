@@ -21,6 +21,8 @@ use \Joomla\CMS\Plugin\PluginHelper;
 use \Joomla\CMS\Language\Multilanguage;
 use \Joomla\CMS\Form\FormFactoryInterface;
 use \Joomla\CMS\MVC\Factory\MVCFactoryInterface;
+use \Joomla\CMS\Uri\Uri;
+use \Joomla\Registry\Registry;
 use \Joomgallery\Component\Joomgallery\Administrator\Helper\JoomHelper;
 
 /**
@@ -1142,11 +1144,19 @@ class ImageModel extends JoomAdminModel
       // Create config service
       $this->component->createConfig();
 
+	  // Create filemanager service
+	  $this->component->createFileManager($table->catid);
+	  $path = $this->component->getFileManager()->getImgPath($table, $type);
+
+	  // Get registry to be used in writeMetadata
+	  $registry = new Registry($table->imgmetadata);
+
       // Create the metadata service
       $this->component->createMetadata($this->component->getConfig()->get('jg_metaprocessor', 'php'));
 
-      // Perfrom the save using the metadata service
-      $this->component->getMetadata()->writeMetadata("", $array);
+      // Perfrom the save using the metadata/filesystem service
+      $data = $this->component->getMetadata()->writeMetadata(substr(Uri::root(), 0, -1) . $path, $registry);
+	  $this->component->getFilesystem()->createFile(basename($path), dirname($path), $data);
     }
     else
     {
