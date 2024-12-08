@@ -26,7 +26,7 @@ class IptcDataEditor
     /**
      * @var array
      */
-    protected $iptcStringArray = array(
+    public $iptcStringArray = array(
         '2#003' => [3, 67],
         '2#005' => [0, 64],
         '2#007' => [0, 64],
@@ -40,7 +40,7 @@ class IptcDataEditor
         '2#090' => [0, 32],
         '2#092' => [0, 32],
         '2#095' => [0, 32],
-        '2#095' => [3, 3],
+        '2#100' => [3, 3],
         '2#101' => [0, 64],
         '2#105' => [0, 256],
         '2#110' => [0, 32],
@@ -54,7 +54,7 @@ class IptcDataEditor
     /**
      * @var array
      */
-    protected $iptcDigitsArray = array(
+    public $iptcDigitsArray = array(
         '2#008' => 2,
         '2#010' => 1,
         '2#055' => 8
@@ -72,8 +72,8 @@ class IptcDataEditor
      */
     public function createEdit(string $tag, mixed $data): mixed
     {
-        if ((isset($iptcStringArray) && $iptcStringArray[$tag][0] <= strlen($data) && strlen($data) <= $iptcStringArray[$tag][1]) ||
-            (isset($iptcDigitsArray) && $iptcDigitsArray[$tag] >= $data)) {
+        if ((isset($this->iptcStringArray) && $this->iptcStringArray[$tag][0] <= strlen($data) && strlen($data) <= $this->iptcStringArray[$tag][1]) ||
+            (isset($this->iptcDigitsArray) && $this->iptcDigitsArray[$tag] >= $data)) {
             $explode = explode("#", $tag);
             $octetStruct = self::makeTag(intval($explode[0]), intval($explode[1]), $data);
             return $octetStruct;

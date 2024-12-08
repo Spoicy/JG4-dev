@@ -73,5 +73,5 @@ interface MetadataInterface
    * 
    * @since   4.0.0
    */
-  public function writeToIptc(string $img, array $edits): bool;
+  public function writeToIptc(string $img, $edits): bool;
 }

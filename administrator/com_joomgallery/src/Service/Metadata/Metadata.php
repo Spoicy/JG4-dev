@@ -61,13 +61,13 @@ class Metadata implements MetadataInterface
    * Saves an edit to the iptc metadata of an image
    * 
    * @param   string $img   Path to the image 
-   * @param   array $edits  Array of edits to be made to the metadata
+   * @param   mixed $edits  Array of edits to be made to the metadata
    * 
    * @return  bool          True on success, false on failure
    * 
    * @since   4.0.0
    */
-  public function writeToIptc(string $img, array $edits): bool
+  public function writeToIptc(string $img, $edits): bool
   {
     return false;
   }
