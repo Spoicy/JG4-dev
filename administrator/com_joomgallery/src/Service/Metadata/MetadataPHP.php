@@ -133,7 +133,9 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     $exifSuccess = self::writeToExif($tmpPath, $imgmetadata->get('exif'));
     $iptcSuccess = self::writeToIptc($tmpPath, $imgmetadata->get('iptc'));
 
-    return file_get_contents($tmpPath);
+    $data = file_get_contents($tmpPath);
+    unlink($tmpPath);
+    return $data;
   }
 
   /**
