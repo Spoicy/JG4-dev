@@ -1076,7 +1076,6 @@ abstract class IMGtools implements IMGtoolsInterface
   protected function readImageMetadata($img)
   {
     $size = \getimagesize($img, $info);
-    //xdebug_break();
 
     // Check the installation of Exif
     if(\extension_loaded('exif') && \function_exists('exif_read_data') && $size[2] == 2)

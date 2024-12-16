@@ -18,6 +18,8 @@ use \Joomla\Registry\Registry;
 use \Joomgallery\Component\Joomgallery\Administrator\Helper\JoomHelper;
 use \Joomgallery\Component\Joomgallery\Administrator\Extension\ServiceTrait;
 use \Joomgallery\Component\Joomgallery\Administrator\Service\Metadata\Metadata as BaseMetadata;
+use \Joomla\CMS\Filesystem\File;
+use \Joomla\CMS\Filesystem\Path;
 
 use \lsolesen\pel\Pel;
 use \lsolesen\pel\PelDataWindow;
@@ -103,9 +105,26 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     $this->getApp();
   }
 
-  public function writeMetadata($img, $imgmetadata): mixed
+  public function writeMetadata($img, $imgmetadata, $is_stream = false, $base64 = false): mixed
   {
-    $file = file_get_contents($img);
+    $tmpFolder = $this->app->get('tmp_path');
+    if (!$is_stream) {
+      $img = Path::clean($img);
+
+      if (!\file_exists($img)) {
+        $img = JPATH_ROOT . \DIRECTORY_SEPARATOR . $img;
+
+        $img = Path::clean($img);
+      }
+      $file = file_get_contents($img);
+      $tmpPath = $tmpFolder . '/' . basename($img);
+    }
+
+    if ($is_stream && $base64) {
+      $file = \base64_decode($img);
+      $tmpPath = $tmpFolder . "/tmp_imagefile.jpg";
+    }
+
     $tmpFolder = $this->app->get('tmp_path');
     $tmpPath = $tmpFolder . '/' . basename($img);
 

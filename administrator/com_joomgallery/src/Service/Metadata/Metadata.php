@@ -37,7 +37,7 @@ class Metadata implements MetadataInterface
     return false;
   }
 
-  public function writeMetadata($img, $imgmetadata): mixed
+  public function writeMetadata($img, $imgmetadata, $is_stream, $base64): mixed
   {
     return false;
   }

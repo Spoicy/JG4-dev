@@ -49,7 +49,7 @@ interface MetadataInterface
    * 
    * @return mixed                Image data to be stored with Filemanager
    */
-  public function writeMetadata($img, $imgmetadata);
+  public function writeMetadata($img, $imgmetadata, $is_stream, $base64);
 
   /**
    * Writes a list of values to the exif metadata of an image
