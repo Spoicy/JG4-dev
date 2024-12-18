@@ -39,19 +39,18 @@
     
         <field name="ExifVersion"
                type="text"
-               pattern="^0\d{3}$"
                label="COM_JOOMGALLERY_SUBIFD_EXIFVERSION"
                message="COM_JOOMGALLERY_SUBIFD_EXIFVERSION_DESCRIPTION" />
     
         <field name="DateTimeOriginal"
-               type="text"
-               pattern="^[\x20-\x7E]*$"
+               type="calendar"
+               format="%Y:%m:%d %H:%M:%S"
                label="COM_JOOMGALLERY_SUBIFD_DATETIMEORIGINAL"
                message="COM_JOOMGALLERY_SUBIFD_DATETIMEORIGINAL_DESCRIPTION" />
     
         <field name="DateTimeDigitized"
-               type="text"
-               pattern="^[\x20-\x7E]*$"
+               type="calendar"
+               format="%Y:%m:%d %H:%M:%S"
                label="COM_JOOMGALLERY_SUBIFD_DATETIMEDIGITIZED"
                message="COM_JOOMGALLERY_SUBIFD_DATETIMEDIGITIZED_DESCRIPTION" />
     

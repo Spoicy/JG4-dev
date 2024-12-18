@@ -64,8 +64,8 @@
            message="COM_JOOMGALLERY_IFD0_SOFTWARE_DESCRIPTION" />
 
     <field name="DateTime"
-           type="text"
-           pattern="^[\x20-\x7E]*$"
+           type="calendar"
+           format="%Y:%m:%d %H:%M:%S"
            label="COM_JOOMGALLERY_IFD0_DATETIME"
            message="COM_JOOMGALLERY_IFD0_DATETIME_DESCRIPTION" />
 
