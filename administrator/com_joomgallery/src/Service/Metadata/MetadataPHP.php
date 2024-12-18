@@ -183,7 +183,7 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
         continue;
       }
       $tag = PelTag::getExifTagByName($name);
-      $editor->makeEdit($ifd0, $tag, self::formatForPelEntry($edit, self::$entryTypes[$tag]), self::$entryTypes[$tag]);
+      $editor->makeEdit($ifd0, $tag, self::formatForPelEntry($tag, $edit, self::$entryTypes[$tag]), self::$entryTypes[$tag]);
     }
     foreach ($edits->EXIF as $name => $edit) {
       if (!isset(self::$entryTypes[PelTag::getExifTagByName($name)]) || $edit == "") {
@@ -191,7 +191,7 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
         continue;
       }
       $tag = PelTag::getExifTagByName($name);
-      $editor->makeEdit($subIfd, $tag, self::formatForPelEntry($edit, self::$entryTypes[$tag]), self::$entryTypes[$tag]);
+      $editor->makeEdit($subIfd, $tag, self::formatForPelEntry($tag, $edit, self::$entryTypes[$tag]), self::$entryTypes[$tag]);
     }
 
     $exifdata->setTiff($tiff);
@@ -345,7 +345,7 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
       return $entry->formatNumber($numbers);
     } elseif ($entry instanceof PelEntryCopyright) {
       // Copyright is stored in PEL as an array, it needs to be reformatted for the form.
-      return $entry->getText();
+      return $entry->getText(true);
     } elseif ($entry instanceof PelEntryTime) {
       return $entry->getValue(PelEntryTime::EXIF_STRING);
     } else {
@@ -353,11 +353,17 @@ class MetadataPHP extends BaseMetadata implements MetadataInterface
     }
   }
 
-  private function formatForPelEntry($entry, $type)
+  private function formatForPelEntry($tag, $entry, $type)
   {
     if ($type == PelFormat::RATIONAL || $type == PelFormat::SRATIONAL) {
       $explode = explode("/", $entry);
       return [intval($explode[0]), intval($explode[1])];
+    } else if ($tag == PelTag::COPYRIGHT) {
+      $explode = explode(" - ", $entry);
+      if (!isset($explode[1])) {
+        return [$explode[0], ""];
+      }
+      return [$explode[0], $explode[1]];
     } else {
       return $entry;
     }
