@@ -303,14 +303,14 @@ class ImageController extends JoomFormController
     if(!$model->savemetadata((int) $data['id'], $imagetype))
     {
       // Redirect back to the image edit screen.
-      $this->setMessage(Text::_('COM_JOOMGALLERY_ERROR_SAVE_METDATA_TO_FILE', $model->getError()), 'error');
+      $this->setMessage(Text::_('COM_JOOMGALLERY_ERROR_SAVE_METADATA_TO_FILE', $model->getError()), 'error');
       $this->setRedirect(Route::_($url, false));
 
       return false;
     }
 
     // Set message
-    $this->setMessage(Text::_('COM_JOOMGALLERY_SUCCESS_SAVE_METDATA_TO_FILE'));
+    $this->setMessage(Text::_('COM_JOOMGALLERY_SUCCESS_SAVE_METADATA_TO_FILE'));
 
     // Check if there is a return value
     $return = $this->input->get('return', null, 'base64');
